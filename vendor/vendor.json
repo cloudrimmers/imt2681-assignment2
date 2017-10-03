@@ -1,0 +1,10 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [],
+	"rootPath": "github.com/Arxcis/imt2681-assignment2",
+
+	"heroku": {
+		"goVersion": "go1.6"
+	}
+}
