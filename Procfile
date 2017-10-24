@@ -1,1 +1,1 @@
-web: imt2681-assignment2
+web: imt2681-assignment2/cmd/server
