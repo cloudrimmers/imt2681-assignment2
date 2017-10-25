@@ -1,4 +1,7 @@
 
+## 25.10.17
+Channels go - https://gobyexample.com/channels
+
 ## 24.10.17
 go vs C# async - https://medium.com/@alexyakunin/go-vs-c-part-1-goroutines-vs-async-await-ac909c651c11
 
