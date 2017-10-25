@@ -1,6 +1,6 @@
 package payload
 
-// Ticker ...
+// FixerIn ...
 /* Example JSON:
 {
 	"base":"EUR",
@@ -13,7 +13,7 @@ package payload
     }
 }
 */
-type Ticker struct {
+type FixerIn struct {
 	Base  string
 	Date  string
 	Rates map[string]float64

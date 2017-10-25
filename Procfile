@@ -1,1 +1,2 @@
-web: imt2681-assignment2/cmd/server
+webhookserver: imt2681-assignment2/cmd/webhookserver
+fixerworker: imt2681-assignment2/cmd/fixerworker
