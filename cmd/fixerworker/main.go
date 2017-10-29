@@ -12,7 +12,7 @@ import (
 )
 
 const fixerURL string = "http://api.fixer.io/latest?base=EUR"
-const mongoDbName string = "test"
+const mongoDbName string = "heroku_56nng409"
 const mongoDbCollection string = "tick"
 const intervall time.Duration = 24 * time.Hour
 
@@ -46,7 +46,7 @@ func dumpFromFixerURL() {
 	// 4. Dump payload to database
 	err = session.DB(mongoDbName).C(mongoDbCollection).Insert(fixerPayload)
 	if err != nil {
-		log.Fatal("Error on session.DB(", mongoDbName, ").C(", mongoDbCollection, ").Insert(<Payload>)", fixerPayload, err.Error())
+		log.Fatal("Error on session.DB(", mongoDbName, ").C(", mongoDbCollection, ").Insert(<Payload>)", err.Error())
 	}
 
 	log.Print("Tick success: ", fixerPayload)
