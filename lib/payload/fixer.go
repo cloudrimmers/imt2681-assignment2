@@ -14,7 +14,8 @@ package payload
 }
 */
 type FixerIn struct {
-	Base  string
-	Date  string
-	Rates map[string]float64
+	Base      string
+	Datestamp string
+	Date      string `json:"date"`
+	Rates     map[string]float64
 }

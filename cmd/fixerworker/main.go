@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -11,45 +12,84 @@ import (
 	mgo "gopkg.in/mgo.v2"
 )
 
-const fixerURL string = "http://api.fixer.io/latest?base=EUR"
-const mongoDbName string = "heroku_56nng409"
-const mongoDbCollection string = "tick"
-const intervall time.Duration = 24 * time.Hour
+// UntilTomorrow ...
+func UntilTomorrow() time.Duration {
+	// @doc https://stackoverflow.com/a/36988882
+	now := time.Now()
+	tomorrow := now.Add(time.Hour * 24)
+	tomorrow = time.Date(
+		tomorrow.Year(),
+		tomorrow.Month(),
+		tomorrow.Day(),
+		0, 0, 0, 0,
+		tomorrow.Location()) // Round to 00:00:00
 
-var mongoDbConnect string = os.Getenv("MONGODB_URI")
+	diff := tomorrow.Sub(now)
 
-func dumpFromFixerURL() {
+	// @debug
+	log.Println("Tommorrow :", tomorrow)
+	log.Println("Today     :", now)
+	log.Println("Diff      :", diff)
+	return diff
+}
+
+func fixer2mongo(
+	mongoURI string,
+	fixerURI string,
+	mongoDB string,
+	mongoC string) {
 
 	// 1. Connect and request to fixer.io
-	resp, err := http.Get(fixerURL)
+	resp, err := http.Get(fixerURI)
 	if err != nil {
-		log.Fatal("Wrong contact with: "+fixerURL+" ...", err.Error())
+		log.Fatal("Wrong contact with: "+fixerURI+" ...", err.Error())
 		return
 	}
 
 	// 2. Decode payload
-	fixerPayload := &(payload.FixerIn{})
-	err = json.NewDecoder(resp.Body).Decode(fixerPayload)
+	payload := &(payload.FixerIn{})
+	err = json.NewDecoder(resp.Body).Decode(payload)
 	if err != nil {
 		log.Fatal("Could not decode resp.Body...", err.Error())
 		return
 	}
 
 	// 3. Connect to DB
-	session, err := mgo.Dial(mongoDbConnect)
+	session, err := mgo.Dial(mongoURI)
 	if err != nil {
-		log.Fatal("No connection with mongodb @ ", mongoDbConnect, err.Error())
+		log.Fatal("No connection with mongodb @ ", mongoURI, err.Error())
 		return
 	}
 	defer session.Close()
 
-	// 4. Dump payload to database
-	err = session.DB(mongoDbName).C(mongoDbCollection).Insert(fixerPayload)
-	if err != nil {
-		log.Fatal("Error on session.DB(", mongoDbName, ").C(", mongoDbCollection, ").Insert(<Payload>)", err.Error())
+	// 4. Generate datestamp
+	now := time.Now()
+	payload.Datestamp = fmt.Sprintf("%d-%02d-%02d", now.Year(), now.Month(), now.Day())
+
+	// 5. Check if already exist
+	collection := session.DB(mongoDB).C(mongoC)
+	query, _ := json.Marshal(struct {
+		Base      string
+		Datestamp string
+	}{
+		payload.Base,
+		payload.Datestamp,
+	})
+
+	log.Println(string(query))
+	if collection.Find(string(query)) == nil {
+		log.Fatal("Already exist...")
+		return
 	}
 
-	log.Print("Tick success: ", fixerPayload)
+	// 6. Dump payload to database
+	err = session.DB(mongoDB).C(mongoC).Insert(payload)
+	if err != nil {
+		log.Fatal("Error on db.Insert():\n", err.Error())
+		return
+	}
+
+	log.Print("Tick success: ", payload.Datestamp)
 }
 
 func main() {
@@ -57,9 +97,14 @@ func main() {
 	log.Println("Initializing ticker....")
 
 	// @doc https://stackoverflow.com/a/35009735
-	ticker := time.NewTicker(intervall)
-	dumpFromFixerURL()
-	for _ = range ticker.C {
-		dumpFromFixerURL()
+	for {
+		fixer2mongo(
+			os.Getenv("MONGODB_URI"),
+			os.Getenv("FIXERIO_URI"),
+			os.Getenv("MONGODB_NAME"),
+			os.Getenv("MONGODB_COLLECTION"))
+		ticker := time.NewTicker(UntilTomorrow())
+		<-ticker.C // Wait
+		ticker.Stop()
 	}
 }
