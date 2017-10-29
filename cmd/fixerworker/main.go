@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/payload"
+	mgo "gopkg.in/mgo.v2"
 )
 
 const fixerURL string = "http://api.fixer.io/latest?base=EUR"
@@ -15,28 +16,36 @@ const mongoDbConnect string = "127.0.0.1:27017"
 
 func dumpFromFixerURL() {
 
-	// 1. Connect to DB
-	//session, err := mgo.Dial(mongoDbConnect)
-	//if err != nil {
-	//	log.Fatal("No connection with mongodb @ ", mongoDbConnect)
-	//}
-	//defer session.Close()
-
-	// 2. Connect and request to
+	// 1. Connect and request to fixer.io
 	resp, err := http.Get(fixerURL)
 	if err != nil {
 		log.Fatal("Wrong contact with: "+fixerURL+" ...", err.Error())
+		return
 	}
 
-	// 3. Decode payload
+	// 2. Decode payload
 	fixerPayload := &(payload.FixerIn{})
 	err = json.NewDecoder(resp.Body).Decode(fixerPayload)
 	if err != nil {
 		log.Fatal("Could not decode resp.Body...", err.Error())
+		return
 	}
 
+	// 3. Connect to DB
+	session, err := mgo.Dial(mongoDbConnect)
+	if err != nil {
+		log.Fatal("No connection with mongodb @ ", mongoDbConnect, err.Error())
+		return
+	}
+	defer session.Close()
+
 	// 4. Dump payload to database
-	log.Print(fixerPayload, "\n\n")
+	err = session.DB("test").C("tick").Insert(fixerPayload)
+	if err != nil {
+		log.Fatal("Error on session.DB().C('tick').Insert(<Payload>)", fixerPayload, err.Error())
+	}
+
+	log.Print("Tick success: ", fixerPayload)
 }
 
 func main() {
