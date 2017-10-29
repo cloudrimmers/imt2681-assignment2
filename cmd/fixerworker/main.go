@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/payload"
@@ -11,10 +12,11 @@ import (
 )
 
 const fixerURL string = "http://api.fixer.io/latest?base=EUR"
-const mongoDbConnect string = "127.0.0.1:27017"
 const mongoDbName string = "test"
 const mongoDbCollection string = "tick"
 const intervall time.Duration = 24 * time.Hour
+
+var mongoDbConnect string = os.Getenv("MONGODB_URI")
 
 func dumpFromFixerURL() {
 
