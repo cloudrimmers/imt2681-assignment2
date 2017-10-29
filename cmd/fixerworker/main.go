@@ -11,8 +11,10 @@ import (
 )
 
 const fixerURL string = "http://api.fixer.io/latest?base=EUR"
-const fixerFile string = "../../data/baseEUR.json"
 const mongoDbConnect string = "127.0.0.1:27017"
+const mongoDbName string = "test"
+const mongoDbCollection string = "tick"
+const intervall time.Duration = 24 * time.Hour
 
 func dumpFromFixerURL() {
 
@@ -40,9 +42,9 @@ func dumpFromFixerURL() {
 	defer session.Close()
 
 	// 4. Dump payload to database
-	err = session.DB("test").C("tick").Insert(fixerPayload)
+	err = session.DB(mongoDbName).C(mongoDbCollection).Insert(fixerPayload)
 	if err != nil {
-		log.Fatal("Error on session.DB().C('tick').Insert(<Payload>)", fixerPayload, err.Error())
+		log.Fatal("Error on session.DB(", mongoDbName, ").C(", mongoDbCollection, ").Insert(<Payload>)", fixerPayload, err.Error())
 	}
 
 	log.Print("Tick success: ", fixerPayload)
@@ -53,7 +55,7 @@ func main() {
 	log.Println("Initializing ticker....")
 
 	// @doc https://stackoverflow.com/a/35009735
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(intervall)
 	dumpFromFixerURL()
 	for _ = range ticker.C {
 		dumpFromFixerURL()
