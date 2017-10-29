@@ -1,6 +1,8 @@
 
 ## 25.10.17
 Channels go - https://gobyexample.com/channels
+Mongodb go driver - https://labix.org/mgo
+Install mongodb ubuntu - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
 
 ## 24.10.17
 go vs C# async - https://medium.com/@alexyakunin/go-vs-c-part-1-goroutines-vs-async-await-ac909c651c11
