@@ -1,4 +1,4 @@
-package payload
+package types
 
 // FixerIn ...
 /* Example JSON:
