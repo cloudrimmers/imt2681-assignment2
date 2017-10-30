@@ -9,29 +9,9 @@ import (
 	"time"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/payload"
+	"github.com/Arxcis/imt2681-assignment2/lib/tool"
 	mgo "gopkg.in/mgo.v2"
 )
-
-// UntilTomorrow ...
-func UntilTomorrow() time.Duration {
-	// @doc https://stackoverflow.com/a/36988882
-	now := time.Now()
-	tomorrow := now.Add(time.Hour * 24)
-	tomorrow = time.Date(
-		tomorrow.Year(),
-		tomorrow.Month(),
-		tomorrow.Day(),
-		0, 0, 0, 0,
-		tomorrow.Location()) // Round to 00:00:00
-
-	diff := tomorrow.Sub(now)
-
-	// @debug
-	log.Println("Tommorrow :", tomorrow)
-	log.Println("Today     :", now)
-	log.Println("Diff      :", diff)
-	return diff
-}
 
 func fixer2mongo(
 	mongoURI string,
@@ -103,7 +83,7 @@ func main() {
 			os.Getenv("FIXERIO_URI"),
 			os.Getenv("MONGODB_NAME"),
 			os.Getenv("MONGODB_COLLECTION"))
-		ticker := time.NewTicker(UntilTomorrow())
+		ticker := time.NewTicker(tool.UntilTomorrow())
 		<-ticker.C // Wait
 		ticker.Stop()
 	}
