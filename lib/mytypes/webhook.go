@@ -1,5 +1,7 @@
 package mytypes
 
+import "gopkg.in/mgo.v2/bson"
+
 // WebhookIn ...
 /* Example:
 {
@@ -11,6 +13,7 @@ package mytypes
 }
 */
 type WebhookIn struct {
+	ID              bson.ObjectId
 	WebhookURL      string
 	BaseCurrency    string
 	TargetCurrency  string
@@ -29,9 +32,22 @@ type WebhookIn struct {
 }
 */
 type WebhookOut struct {
+	ID              bson.ObjectId
 	BaseCurrency    string
 	TargetCurrency  string
 	CurrentRate     float64
 	MinTriggerValue float64
 	MaxTriggerValue float64
+}
+
+// CurrencyIn ...
+/* Example:
+{
+	"baseCurrency": "EUR",
+	"targetCurrency": "NOK",
+}
+*/
+type CurrencyIn struct {
+	BaseCurrency   string
+	TargetCurrency string
 }

@@ -1,5 +1,7 @@
 package mytypes
 
+import "gopkg.in/mgo.v2/bson"
+
 // FixerIn ...
 /* Example JSON:
 {
@@ -14,6 +16,7 @@ package mytypes
 }
 */
 type FixerIn struct {
+	ID        bson.ObjectId
 	Base      string
 	Datestamp string
 	Date      string `json:"date"`

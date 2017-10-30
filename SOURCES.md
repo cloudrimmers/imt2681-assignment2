@@ -1,4 +1,7 @@
 
+##31.10.17
+bson.NewObjectID - https://stackoverflow.com/a/22498338
+
 ## 25.10.17
 Channels go - https://gobyexample.com/channels
 Mongodb go driver - https://labix.org/mgo
