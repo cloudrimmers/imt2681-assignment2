@@ -20,9 +20,25 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 func PostWebhook(w http.ResponseWriter, r *http.Request) {
 
 	webhook := &mytypes.WebhookIn{}
-	json.NewDecoder(r.Body).Decode(webhook)
+	_ = json.NewDecoder(r.Body).Decode(webhook)
 	fmt.Println(webhook)
-	strrandom := strconv.Itoa(rand.Int())
+	id := strconv.Itoa(rand.Int())
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(strrandom))
+	w.Write([]byte(id))
+}
+
+// GetWebhook ...
+func GetWebhook(w http.ResponseWriter, r *http.Request) {
+
+	// ERROR HANDLING
+
+	w.Header().Add("content-type", "application/json")
+}
+
+// GetWebhookAll ...
+func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
+
+	// ERROR HANDLING
+
+	w.Header().Add("content-type", "application/json")
 }
