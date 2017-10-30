@@ -3,15 +3,13 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
-	"gopkg.in/mgo.v2/bson"
-
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
-
-	"github.com/gorilla/mux"
-
 	"github.com/Arxcis/imt2681-assignment2/lib/mytypes"
+	"github.com/gorilla/mux"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // HelloWorld ...
@@ -30,16 +28,24 @@ func PostWebhook(w http.ResponseWriter, r *http.Request) {
 
 	db, err := database.Open()
 	if err != nil {
-
-		// Handle error
+		serviceUnavailable(w, err)
+		return
 	}
 	defer database.Close()
 
 	webhook.ID = bson.NewObjectId()
-	db.C("hook").Insert(webhook)
+	err = db.C("hook").Insert(webhook)
+	if err != nil {
+		internalServerError(w, err)
+		return
+	}
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(webhook.ID))
+}
+
+func noInsertAllowed() {
+
 }
 
 // GetWebhook ...
@@ -49,8 +55,8 @@ func GetWebhook(w http.ResponseWriter, r *http.Request) {
 
 	db, err := database.Open()
 	if err != nil {
-
-		// Handle error
+		serviceUnavailable(w, err)
+		return
 	}
 	defer database.Close()
 
@@ -68,8 +74,8 @@ func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 
 	db, err := database.Open()
 	if err != nil {
-
-		// Handle error
+		serviceUnavailable(w, err)
+		return
 	}
 	defer database.Close()
 
@@ -89,8 +95,8 @@ func GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 
 	db, err := database.Open()
 	if err != nil {
-
-		// Handle error
+		serviceUnavailable(w, err)
+		return
 	}
 	defer database.Close()
 
@@ -106,8 +112,8 @@ func GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 
 	db, err := database.Open()
 	if err != nil {
-
-		// Handle error
+		serviceUnavailable(w, err)
+		return
 	}
 	defer database.Close()
 
@@ -119,8 +125,8 @@ func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 
 	db, err := database.Open()
 	if err != nil {
-
-		// Handle error
+		serviceUnavailable(w, err)
+		return
 	}
 	defer database.Close()
 
@@ -131,6 +137,17 @@ func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
+// Private
 func computeAverage() float64 {
 	return 8.7
+}
+
+func serviceUnavailable(w http.ResponseWriter, err error) {
+	log.Println("No database connection: ", err.Error())
+	http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
+}
+
+func internalServerError(w http.ResponseWriter, err error) {
+	log.Println("Collection.Insert error", err.Error())
+	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }

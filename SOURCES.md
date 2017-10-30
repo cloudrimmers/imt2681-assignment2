@@ -1,5 +1,6 @@
-
 ##31.10.17
+httpstatuses - https://httpstatuses.com/
+database not available status - https://stackoverflow.com/a/1434330
 bson.NewObjectID - https://stackoverflow.com/a/22498338
 
 ## 25.10.17
