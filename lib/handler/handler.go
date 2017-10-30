@@ -40,6 +40,10 @@ func DeleteSubscription(w http.ResponseWriter, r *http.Request) {
 
 // InitHandlers ...
 func InitHandlers(router *mux.Router) {
-
-	router.HandleFunc("/api/v1/subscription", GetSubscription)
+	const apiBase string = "/api/v1"
+	router.HandleFunc(apiBase+"/subscription", GetSubscriptionAll).Methods("GET")
+	router.HandleFunc(apiBase+"/subscription/{id}", GetSubscription).Methods("GET")
+	router.HandleFunc(apiBase+"/subscription", PostSubscription).Methods("POST")
+	router.HandleFunc(apiBase+"/subscription/{id}", PutSubscription).Methods("PUT")
+	router.HandleFunc(apiBase+"/subscription/{id}", DeleteSubscription).Methods("DELETE")
 }
