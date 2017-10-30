@@ -1,2 +1,2 @@
 web: webhookserver
-worker: fixerworker
+clock: fixerworker
