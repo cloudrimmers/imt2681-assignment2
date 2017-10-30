@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/Arxcis/imt2681-assignment2/lib/mytypes"
 	"github.com/Arxcis/imt2681-assignment2/lib/tool"
-	"github.com/Arxcis/imt2681-assignment2/lib/types"
 	mgo "gopkg.in/mgo.v2"
 )
 
@@ -27,7 +27,7 @@ func fixer2mongo(
 	}
 
 	// 2. Decode payload
-	payload := &(types.FixerIn{})
+	payload := &(mytypes.FixerIn{})
 	err = json.NewDecoder(resp.Body).Decode(payload)
 	if err != nil {
 		log.Println("Could not decode resp.Body...", err.Error())

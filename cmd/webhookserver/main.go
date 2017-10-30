@@ -13,6 +13,12 @@ func main() {
 	log.Println("Initializing server....")
 
 	router := mux.NewRouter().StrictSlash(true)
-	handler.InitHandlers(router)
-	log.Println(http.ListenAndServe(":"+os.Getenv("PORT"), router))
+	apiBase := os.Getenv("API_VERSION_PATH")
+	port := os.Getenv("PORT")
+
+	router.HandleFunc("/", handler.HelloWorld).Methods("GET")
+	router.HandleFunc(apiBase+"/", handler.PostWebhook).Methods("POST")
+
+	log.Println("port: ", port, "apiBase: ", apiBase)
+	log.Println(http.ListenAndServe(":"+port, router))
 }

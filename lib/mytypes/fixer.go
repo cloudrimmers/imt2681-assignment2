@@ -1,4 +1,4 @@
-package types
+package mytypes
 
 // FixerIn ...
 /* Example JSON:
