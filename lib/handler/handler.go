@@ -44,14 +44,11 @@ func PostWebhook(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(webhook.ID))
 }
 
-func noInsertAllowed() {
-
-}
-
 // GetWebhook ...
 func GetWebhook(w http.ResponseWriter, r *http.Request) {
 
-	vars := mux.Vars(r)
+	hook := mytypes.WebhookIn{}
+	hook.ID = bson.ObjectId(mux.Vars(r)["id"])
 
 	db, err := database.Open()
 	if err != nil {
@@ -60,10 +57,15 @@ func GetWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 	defer database.Close()
 
+	query := db.C("hook").FindId(hook.ID)
+	err = query.One(hook)
+	if err != nil {
+		notFound(w, err)
+		return
+	}
+
 	w.Header().Add("content-type", "application/json")
 
-	hook := mytypes.WebhookIn{}
-	hook.ID = bson.ObjectId(vars["id"])
 	data, _ := json.Marshal(hook)
 	w.Write(data)
 
@@ -72,13 +74,13 @@ func GetWebhook(w http.ResponseWriter, r *http.Request) {
 // GetWebhookAll ...
 func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 
-	db, err := database.Open()
-	if err != nil {
-		serviceUnavailable(w, err)
-		return
-	}
-	defer database.Close()
-
+	/*	db, err := database.Open()
+		if err != nil {
+			serviceUnavailable(w, err)
+			return
+		}
+		defer database.Close()
+	*/
 	w.Header().Add("content-type", "application/json")
 
 	hooks := []mytypes.WebhookIn{}
@@ -93,13 +95,13 @@ func GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 	latest := &mytypes.CurrencyIn{}
 	_ = json.NewDecoder(r.Body).Decode(latest)
 
-	db, err := database.Open()
-	if err != nil {
-		serviceUnavailable(w, err)
-		return
-	}
-	defer database.Close()
-
+	/*	db, err := database.Open()
+		if err != nil {
+			serviceUnavailable(w, err)
+			return
+		}
+		defer database.Close()
+	*/
 	fixer := mytypes.FixerIn{}
 	fmt.Fprintf(w, "%.2f", fixer.Rates[latest.TargetCurrency])
 }
@@ -110,26 +112,26 @@ func GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 	latest := &mytypes.CurrencyIn{}
 	_ = json.NewDecoder(r.Body).Decode(latest)
 
-	db, err := database.Open()
+	/*db, err := database.Open()
 	if err != nil {
 		serviceUnavailable(w, err)
 		return
 	}
 	defer database.Close()
-
+	*/
 	fmt.Fprintf(w, "%.2f", computeAverage())
 }
 
 // EvaluationTrigger ...
 func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 
-	db, err := database.Open()
+	/*db, err := database.Open()
 	if err != nil {
 		serviceUnavailable(w, err)
 		return
 	}
 	defer database.Close()
-
+	*/
 	w.Header().Add("content-type", "application/json")
 
 	hooks := []mytypes.WebhookOut{}
@@ -150,4 +152,9 @@ func serviceUnavailable(w http.ResponseWriter, err error) {
 func internalServerError(w http.ResponseWriter, err error) {
 	log.Println("Collection.Insert error", err.Error())
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+}
+
+func notFound(w http.ResponseWriter, err error) {
+	log.Println("Hook not found", err.Error())
+	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 }
