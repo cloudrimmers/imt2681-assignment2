@@ -78,13 +78,14 @@ func main() {
 
 	// @doc https://stackoverflow.com/a/35009735
 	for {
+		ticker := time.NewTicker(tool.UntilTomorrow())
+		<-ticker.C // Wait
+		ticker.Stop()
+
 		fixer2mongo(
 			os.Getenv("MONGODB_URI"),
 			os.Getenv("FIXERIO_URI"),
 			os.Getenv("MONGODB_NAME"),
 			os.Getenv("MONGODB_COLLECTION"))
-		ticker := time.NewTicker(tool.UntilTomorrow())
-		<-ticker.C // Wait
-		ticker.Stop()
 	}
 }

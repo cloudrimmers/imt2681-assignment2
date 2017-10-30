@@ -16,12 +16,11 @@ func UntilTomorrow() time.Duration {
 		tomorrow.Day(),
 		0, 0, 0, 0,
 		tomorrow.Location()) // Round to 00:00:00
-
 	diff := tomorrow.Sub(now)
 
 	// @debug
 	log.Println("Tommorrow :", tomorrow)
-	log.Println("Today     :", now)
+	log.Println("Now       :", now)
 	log.Println("Diff      :", diff)
 	return diff
 }
