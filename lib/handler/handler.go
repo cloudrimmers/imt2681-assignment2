@@ -3,9 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"net/http"
-	"strconv"
 
 	"gopkg.in/mgo.v2/bson"
 
@@ -30,13 +28,18 @@ func PostWebhook(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(webhook)
 	fmt.Println(webhook)
 
-	database, _ := database.Get()
-	webhook.ID = bson.NewObjectId()
-	database.C("hook").Insert(webhook)
+	db, err := database.Open()
+	if err != nil {
 
-	id := strconv.Itoa(rand.Int())
+		// Handle error
+	}
+	defer database.Close()
+
+	webhook.ID = bson.NewObjectId()
+	db.C("hook").Insert(webhook)
+
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(id))
+	w.Write([]byte(webhook.ID))
 }
 
 // GetWebhook ...
@@ -44,12 +47,17 @@ func GetWebhook(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 
-	// ERROR HANDLING
+	db, err := database.Open()
+	if err != nil {
+
+		// Handle error
+	}
+	defer database.Close()
 
 	w.Header().Add("content-type", "application/json")
 
 	hook := mytypes.WebhookIn{}
-	hook.ID = vars["id"]
+	hook.ID = bson.ObjectId(vars["id"])
 	data, _ := json.Marshal(hook)
 	w.Write(data)
 
@@ -58,7 +66,12 @@ func GetWebhook(w http.ResponseWriter, r *http.Request) {
 // GetWebhookAll ...
 func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 
-	// ERROR HANDLING
+	db, err := database.Open()
+	if err != nil {
+
+		// Handle error
+	}
+	defer database.Close()
 
 	w.Header().Add("content-type", "application/json")
 
@@ -74,7 +87,12 @@ func GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 	latest := &mytypes.CurrencyIn{}
 	_ = json.NewDecoder(r.Body).Decode(latest)
 
-	// ERROR HANDLING
+	db, err := database.Open()
+	if err != nil {
+
+		// Handle error
+	}
+	defer database.Close()
 
 	fixer := mytypes.FixerIn{}
 	fmt.Fprintf(w, "%.2f", fixer.Rates[latest.TargetCurrency])
@@ -86,7 +104,12 @@ func GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 	latest := &mytypes.CurrencyIn{}
 	_ = json.NewDecoder(r.Body).Decode(latest)
 
-	// ERROR HANDLING
+	db, err := database.Open()
+	if err != nil {
+
+		// Handle error
+	}
+	defer database.Close()
 
 	fmt.Fprintf(w, "%.2f", computeAverage())
 }
@@ -94,7 +117,12 @@ func GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 // EvaluationTrigger ...
 func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 
-	// ERROR HANDLING
+	db, err := database.Open()
+	if err != nil {
+
+		// Handle error
+	}
+	defer database.Close()
 
 	w.Header().Add("content-type", "application/json")
 
