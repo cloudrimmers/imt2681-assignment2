@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 )
@@ -40,7 +41,7 @@ func DeleteSubscription(w http.ResponseWriter, r *http.Request) {
 
 // InitHandlers ...
 func InitHandlers(router *mux.Router) {
-	const apiBase string = "/api/v1"
+	apiBase := os.Getenv("API_VERSION_PATH")
 	router.HandleFunc(apiBase+"/subscription", GetSubscriptionAll).Methods("GET")
 	router.HandleFunc(apiBase+"/subscription/{id}", GetSubscription).Methods("GET")
 	router.HandleFunc(apiBase+"/subscription", PostSubscription).Methods("POST")
