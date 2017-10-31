@@ -15,6 +15,7 @@ func validateURI(URI string) error {
 func validateCurrency(currency string, currencies []string) error {
 
 	for _, c := range currencies {
+
 		if c == currency {
 			return nil
 		}
@@ -22,8 +23,8 @@ func validateCurrency(currency string, currencies []string) error {
 	return errors.New("currency not supported")
 }
 
-func validateTriggerValue(value float64, min float64, max float64) error {
-	if value >= min && value <= max {
+func validateTriggerValue(min float64, max float64) error {
+	if min < max && min >= 0.0 && max > 0.0 {
 		return nil
 	}
 	return errors.New("trigger out of bounds")
@@ -45,9 +46,5 @@ func ValidateWebhook(hook *types.Webhook, conf *types.WebConfig) error {
 		return err
 	}
 
-	if err = validateTriggerValue(hook.MinTriggerValue, conf.MinTrigger, conf.MaxTrigger); err != nil {
-		return err
-	}
-
-	return validateTriggerValue(hook.MaxTriggerValue, conf.MinTrigger, conf.MaxTrigger)
+	return validateTriggerValue(hook.MinTriggerValue, hook.MaxTriggerValue)
 }

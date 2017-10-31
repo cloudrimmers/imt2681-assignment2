@@ -37,7 +37,7 @@ func PostWebhook(w http.ResponseWriter, r *http.Request) {
 	defer database.Close()
 
 	webhook.ID = bson.NewObjectId()
-	err = db.C("hook").Insert(webhook)
+	err = db.C(config.CollectionWebhook).Insert(webhook)
 	if err != nil {
 		internalServerError(w, err)
 		return
@@ -64,7 +64,7 @@ func GetWebhook(w http.ResponseWriter, r *http.Request) {
 	queryID := bson.ObjectIdHex(mux.Vars(r)["id"])
 	log.Println("GET - hook.id: ", queryID)
 
-	err = db.C("hook").FindId(queryID).One(hook)
+	err = db.C(config.CollectionWebhook).FindId(queryID).One(hook)
 	if err != nil {
 		notFound(w, err)
 		return
@@ -90,7 +90,7 @@ func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("content-type", "application/json")
 
 	hooks := []types.Webhook{}
-	err = db.C("hook").Find(nil).All(&hooks)
+	err = db.C(config.CollectionWebhook).Find(nil).All(&hooks)
 	if err != nil {
 		notFound(w, err)
 		return
@@ -118,7 +118,7 @@ func GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 	defer database.Close()
 
 	fixer := &types.FixerIn{}
-	err = db.C("tick").Find(bson.M{"datestamp": tool.Todaystamp()}).One(fixer)
+	err = db.C(config.CollectionTick).Find(bson.M{"datestamp": tool.Todaystamp()}).One(fixer)
 	if err != nil {
 		notFound(w, err)
 		return
@@ -145,7 +145,7 @@ func GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 
 	for i := 0; i < dayCount; i++ {
 		fixer := types.FixerIn{}
-		err = db.C("tick").Find(bson.M{"datestamp": tool.Daystamp(i)}).One(&fixer)
+		err = db.C(config.CollectionTick).Find(bson.M{"datestamp": tool.Daystamp(i)}).One(&fixer)
 
 		log.Println("i: ", i, "data: ", tool.Daystamp(i), fixer, latest.BaseCurrency)
 
@@ -172,12 +172,12 @@ func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 	defer database.Close()
 
 	hooks := []types.Webhook{}
-	db.C("hook").Find(nil).All(&hooks)
+	db.C(config.CollectionWebhook).Find(nil).All(&hooks)
 
 	for i, hook := range hooks {
 
 		fixer := types.FixerIn{}
-		err = db.C("tick").Find(bson.M{"datestamp": tool.Todaystamp()}).One(&fixer)
+		err = db.C(config.CollectionTick).Find(bson.M{"datestamp": tool.Todaystamp()}).One(&fixer)
 		if err == nil {
 			hook.CurrentRate = fixer.Rates[hook.TargetCurrency]
 			go hook.Trigger()

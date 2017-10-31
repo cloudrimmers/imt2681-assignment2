@@ -2,7 +2,6 @@ package tool
 
 import (
 	"fmt"
-	"log"
 	"time"
 )
 
@@ -20,9 +19,9 @@ func UntilTomorrow() time.Duration {
 	diff := tomorrow.Sub(now)
 
 	// @debug
-	log.Println("Tommorrow :", tomorrow)
-	log.Println("Now       :", now)
-	log.Println("Diff      :", diff)
+	//log.Println("Tommorrow :", tomorrow)
+	//log.Println("Now       :", now)
+	//log.Println("Diff      :", diff)
 	return diff
 }
 

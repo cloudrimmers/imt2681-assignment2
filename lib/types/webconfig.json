@@ -34,5 +34,7 @@
         "ZAR"
     ],
     "minTrigger": 0.0,
-    "maxTrigger": 9999.0
+    "maxTrigger": 9999.0,
+    "collectionWebhook": "webhook",
+    "cllectionTick":"tick"
 }

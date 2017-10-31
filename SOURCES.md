@@ -1,4 +1,9 @@
+
+## 01.11.17
+- Testing http handlers go - https://elithrar.github.io/article/testing-http-handlers-go/
+
 ## 31.10.17
+- runtime.Caller and path.Dir - https://stackoverflow.com/a/32163888
 - compsite instantiation - https://stackoverflow.com/questions/25601802/why-does-inline-instantiation-of-variable-requires-explicitly-taking-the-address
 - uri validation - https://stackoverflow.com/questions/31480710/validate-url-with-standard-package-in-go
 - Inputvalidation - https://husobee.github.io/golang/validation/2016/01/08/input-validation.html

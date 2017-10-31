@@ -4,18 +4,25 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"path"
+	"runtime"
 )
 
 // WebConfig configures the web-server from the config.json
 type WebConfig struct {
-	Currencies []string
-	MinTrigger float64
-	MaxTrigger float64
+	Currencies        []string
+	MinTrigger        float64
+	MaxTrigger        float64
+	CollectionWebhook string
+	CollectionTick    string
 }
 
 // Load the settings file to configure settings
 func (v *WebConfig) Load() *WebConfig {
-	data, err := ioutil.ReadFile("./webconfig.json")
+
+	_, filename, _, _ := runtime.Caller(0)
+
+	data, err := ioutil.ReadFile(path.Dir(filename) + "/webconfig.json")
 	if err != nil {
 		panic(err.Error())
 	}
