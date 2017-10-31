@@ -6,10 +6,13 @@ import (
 	"log"
 	"net/http"
 
+	"gopkg.in/mgo.v2"
+
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
 	"github.com/Arxcis/imt2681-assignment2/lib/mytypes"
+	"github.com/Arxcis/imt2681-assignment2/lib/tool"
 	"github.com/gorilla/mux"
 )
 
@@ -88,6 +91,10 @@ func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 
 	hooks := []mytypes.WebhookIn{}
 	err = db.C("hook").Find(nil).All(&hooks)
+	if err != nil {
+		notFound(w, err)
+		return
+	}
 
 	data, _ := json.Marshal(hooks)
 	w.Write(data)
@@ -97,16 +104,25 @@ func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 func GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 
 	latest := &mytypes.CurrencyIn{}
-	_ = json.NewDecoder(r.Body).Decode(latest)
+	err := json.NewDecoder(r.Body).Decode(latest)
+	if err != nil {
+		badRequest(w, err)
+		return
+	}
+	db := &mgo.Database{}
+	db, err = database.Open()
+	if err != nil {
+		serviceUnavailable(w, err)
+		return
+	}
+	defer database.Close()
 
-	/*	db, err := database.Open()
-		if err != nil {
-			serviceUnavailable(w, err)
-			return
-		}
-		defer database.Close()
-	*/
-	fixer := mytypes.FixerIn{}
+	fixer := &mytypes.FixerIn{}
+	err = db.C("tick").Find(bson.M{"datestamp": tool.Todaystamp()}).One(fixer)
+	if err != nil {
+		notFound(w, err)
+		return
+	}
 	fmt.Fprintf(w, "%.2f", fixer.Rates[latest.TargetCurrency])
 }
 
@@ -154,11 +170,16 @@ func serviceUnavailable(w http.ResponseWriter, err error) {
 }
 
 func internalServerError(w http.ResponseWriter, err error) {
-	log.Println("Collection.Insert error", err.Error())
+	log.Println("Collection.Insert() error", err.Error())
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
 
 func notFound(w http.ResponseWriter, err error) {
-	log.Println("Hook not found", err.Error())
+	log.Println("Collection.Find() not found", err.Error())
 	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+}
+
+func badRequest(w http.ResponseWriter, err error) {
+	log.Println("Http bad request", err.Error())
+	http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 }

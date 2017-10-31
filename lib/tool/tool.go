@@ -1,6 +1,7 @@
 package tool
 
 import (
+	"fmt"
 	"log"
 	"time"
 )
@@ -23,4 +24,10 @@ func UntilTomorrow() time.Duration {
 	log.Println("Now       :", now)
 	log.Println("Diff      :", diff)
 	return diff
+}
+
+// Todaystamp ...
+func Todaystamp() string {
+	now := time.Now()
+	return fmt.Sprintf("%d-%02d-%02d", now.Year(), now.Month(), now.Day())
 }

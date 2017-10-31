@@ -22,8 +22,8 @@ func main() {
 	router.HandleFunc(apiBase+"/hook/{id}", handler.GetWebhook).Methods("GET")
 	router.HandleFunc(apiBase+"/hook/evaluationtrigger", handler.EvaluationTrigger).Methods("GET")
 
-	router.HandleFunc(apiBase+"/currency/latest", handler.GetLatestCurrency).Methods("GET")
-	router.HandleFunc(apiBase+"/currency/average", handler.GetAverageCurrency).Methods("GET")
+	router.HandleFunc(apiBase+"/currency/latest", handler.GetLatestCurrency).Methods("POST")
+	router.HandleFunc(apiBase+"/currency/average", handler.GetAverageCurrency).Methods("POST")
 
 	log.Println("port: ", port, "apiBase: ", apiBase)
 	log.Println(http.ListenAndServe(":"+port, router))

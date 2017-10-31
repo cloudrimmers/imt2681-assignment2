@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -39,8 +38,7 @@ func fixer2mongo(fixerURI string) {
 	defer database.Close()
 
 	// 4. Generate datestamp
-	now := time.Now()
-	payload.Datestamp = fmt.Sprintf("%d-%02d-%02d", now.Year(), now.Month(), now.Day())
+	payload.Datestamp = tool.Todaystamp()
 
 	// 5. Dump payload to database
 	err = db.C("tick").Insert(payload)
@@ -57,6 +55,8 @@ func main() {
 	log.Println("Initializing ticker....")
 
 	// @doc https://stackoverflow.com/a/35009735
+	//	fixer2mongo(os.Getenv("FIXERIO_URI")) // Seed database
+
 	for {
 		ticker := time.NewTicker(tool.UntilTomorrow())
 		<-ticker.C // Wait
