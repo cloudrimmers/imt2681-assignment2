@@ -169,12 +169,12 @@ func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 	}
 	defer database.Close()
 
-	hooks := []mytypes.WebhookOut{}
+	hooks := []mytypes.WebhookIn{}
 	db.C("hook").Find(nil).All(&hooks)
-	w.Header().Add("content-type", "application/json")
 
-	data, _ := json.Marshal(&hooks)
-	w.Write(data)
+	for _, hook := range hooks {
+		go hook.Trigger()
+	}
 }
 
 func serviceUnavailable(w http.ResponseWriter, err error) {
