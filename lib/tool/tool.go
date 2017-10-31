@@ -31,3 +31,9 @@ func Todaystamp() string {
 	now := time.Now()
 	return fmt.Sprintf("%d-%02d-%02d", now.Year(), now.Month(), now.Day())
 }
+
+// Daystamp ...
+func Daystamp(n int) string {
+	now := time.Now().Add(-time.Hour * 24 * time.Duration(n))
+	return fmt.Sprintf("%d-%02d-%02d", now.Year(), now.Month(), now.Day())
+}

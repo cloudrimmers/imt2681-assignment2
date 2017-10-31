@@ -55,7 +55,7 @@ func main() {
 	log.Println("Initializing ticker....")
 
 	// @doc https://stackoverflow.com/a/35009735
-	//	fixer2mongo(os.Getenv("FIXERIO_URI")) // Seed database
+	// fixer2mongo(os.Getenv("FIXERIO_URI")) // Seed database
 
 	for {
 		ticker := time.NewTicker(tool.UntilTomorrow())

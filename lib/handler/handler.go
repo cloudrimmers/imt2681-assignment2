@@ -6,14 +6,12 @@ import (
 	"log"
 	"net/http"
 
-	"gopkg.in/mgo.v2"
-
-	"gopkg.in/mgo.v2/bson"
-
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
 	"github.com/Arxcis/imt2681-assignment2/lib/mytypes"
 	"github.com/Arxcis/imt2681-assignment2/lib/tool"
 	"github.com/gorilla/mux"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // HelloWorld ...
@@ -132,36 +130,51 @@ func GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 	latest := &mytypes.CurrencyIn{}
 	_ = json.NewDecoder(r.Body).Decode(latest)
 
-	/*db, err := database.Open()
+	db, err := database.Open()
 	if err != nil {
 		serviceUnavailable(w, err)
 		return
 	}
 	defer database.Close()
-	*/
-	fmt.Fprintf(w, "%.2f", computeAverage())
+
+	// @note look 3 days back
+	const dayCount int = 3
+	var average float64
+
+	for i := 0; i < dayCount; i++ {
+		fixer := mytypes.FixerIn{}
+		err = db.C("tick").Find(bson.M{"datestamp": tool.Daystamp(i)}).One(&fixer)
+
+		log.Println("i: ", i, "data: ", tool.Daystamp(i), fixer, latest.BaseCurrency)
+
+		if err != nil {
+			notFound(w, err)
+			return
+		}
+		average += fixer.Rates[latest.TargetCurrency]
+	}
+	average /= float64(dayCount)
+
+	fmt.Fprintf(w, "%.2f", average)
 }
 
 // EvaluationTrigger ...
+// Invoke all wehooks
 func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 
-	/*db, err := database.Open()
+	db, err := database.Open()
 	if err != nil {
 		serviceUnavailable(w, err)
 		return
 	}
 	defer database.Close()
-	*/
-	w.Header().Add("content-type", "application/json")
 
 	hooks := []mytypes.WebhookOut{}
-	data, _ := json.Marshal(hooks)
-	w.Write(data)
-}
+	db.C("hook").Find(nil).All(&hooks)
+	w.Header().Add("content-type", "application/json")
 
-// Private
-func computeAverage() float64 {
-	return 8.7
+	data, _ := json.Marshal(&hooks)
+	w.Write(data)
 }
 
 func serviceUnavailable(w http.ResponseWriter, err error) {
