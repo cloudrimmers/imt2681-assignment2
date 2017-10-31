@@ -34,7 +34,7 @@ func fixer2mongo(fixerURI string) {
 	// 1. Connect and request to fixer.io
 	resp, err := http.Get(fixerURI)
 	if err != nil {
-		log.Println("Wrong contact with: "+fixerURI+" ...", err.Error())
+		log.Println("No connection with fixer.io: "+fixerURI+" ...", err.Error())
 		return
 	}
 
