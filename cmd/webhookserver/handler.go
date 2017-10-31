@@ -1,4 +1,4 @@
-package handler
+package main
 
 import (
 	"encoding/json"
@@ -14,6 +14,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+var config *types.WebConfig = (&types.WebConfig{}).Load()
+
 // HelloWorld ...
 // Example: router.HandleFunc("/projectinfo/v1/github.com/{user}/{repo}", gitRepositoryHandler)
 func HelloWorld(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +26,7 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 // POST    /api/v1/subscription/   create a subscription
 func PostWebhook(w http.ResponseWriter, r *http.Request) {
 
-	webhook := &types.WebhookIn{}
+	webhook := &types.Webhook{}
 	_ = json.NewDecoder(r.Body).Decode(webhook)
 
 	db, err := database.Open()
@@ -50,7 +52,7 @@ func PostWebhook(w http.ResponseWriter, r *http.Request) {
 // GetWebhook ...
 func GetWebhook(w http.ResponseWriter, r *http.Request) {
 
-	hook := &types.WebhookIn{}
+	hook := &types.Webhook{}
 
 	db, err := database.Open()
 	if err != nil {
@@ -87,7 +89,7 @@ func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("content-type", "application/json")
 
-	hooks := []types.WebhookIn{}
+	hooks := []types.Webhook{}
 	err = db.C("hook").Find(nil).All(&hooks)
 	if err != nil {
 		notFound(w, err)

@@ -1,4 +1,6 @@
 ## 31.10.17
+- compsite instantiation - https://stackoverflow.com/questions/25601802/why-does-inline-instantiation-of-variable-requires-explicitly-taking-the-address
+- uri validation - https://stackoverflow.com/questions/31480710/validate-url-with-standard-package-in-go
 - Inputvalidation - https://husobee.github.io/golang/validation/2016/01/08/input-validation.html
 - send post-request from go - https://stackoverflow.com/a/24455606
 - golang with mgo example - https://gist.github.com/congjf/8035830

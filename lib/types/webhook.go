@@ -11,7 +11,6 @@ import (
 )
 
 var (
-	errorURL          = errors.New("invalid url format")
 	errorCurrency     = errors.New("invalid currency format")
 	errorTriggerValue = errors.New("invalid trigger value")
 )
@@ -50,11 +49,6 @@ func (hook *Webhook) Trigger() {
 		log.Println("Error triggering webhook..", err.Error())
 	}
 	defer resp.Body.Close()
-}
-
-// Validate the webhook data when in comes form the client
-func (hook *Webhook) Validate() {
-
 }
 
 // CurrencyIn ...

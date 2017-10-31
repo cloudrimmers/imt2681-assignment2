@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Arxcis/imt2681-assignment2/lib/handler"
 	"github.com/gorilla/mux"
 )
 
@@ -16,14 +15,14 @@ func main() {
 	apiBase := os.Getenv("API_VERSION_PATH")
 	port := os.Getenv("PORT")
 
-	//router.HandleFunc("/", handler.HelloWorld).Methods("GET")
-	router.HandleFunc(apiBase+"/hook", handler.PostWebhook).Methods("POST")
-	router.HandleFunc(apiBase+"/hook", handler.GetWebhookAll).Methods("GET")
-	router.HandleFunc(apiBase+"/hook/{id}", handler.GetWebhook).Methods("GET")
-	router.HandleFunc(apiBase+"/hook/evaluationtrigger", handler.EvaluationTrigger).Methods("GET")
+	//router.HandleFunc("/", HelloWorld).Methods("GET")
+	router.HandleFunc(apiBase+"/hook", PostWebhook).Methods("POST")
+	router.HandleFunc(apiBase+"/hook", GetWebhookAll).Methods("GET")
+	router.HandleFunc(apiBase+"/hook/{id}", GetWebhook).Methods("GET")
+	router.HandleFunc(apiBase+"/hook/evaluationtrigger", EvaluationTrigger).Methods("GET")
 
-	router.HandleFunc(apiBase+"/currency/latest", handler.GetLatestCurrency).Methods("POST")
-	router.HandleFunc(apiBase+"/currency/average", handler.GetAverageCurrency).Methods("POST")
+	router.HandleFunc(apiBase+"/currency/latest", GetLatestCurrency).Methods("POST")
+	router.HandleFunc(apiBase+"/currency/average", GetAverageCurrency).Methods("POST")
 
 	log.Println("port: ", port, "apiBase: ", apiBase)
 	log.Println(http.ListenAndServe(":"+port, router))
