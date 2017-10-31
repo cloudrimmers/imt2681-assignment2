@@ -15,6 +15,9 @@ var err error
 func Open() (*mgo.Database, error) {
 	database := &mgo.Database{}
 	session, err = mgo.Dial(mongoURI)
+
+	session.SetMode(mgo.Monotonic, true) // @note not sure what this is, but many people use it
+
 	if err == nil {
 		database = session.DB(mongoDB)
 	}

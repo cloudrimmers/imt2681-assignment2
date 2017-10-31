@@ -13,7 +13,7 @@ import "gopkg.in/mgo.v2/bson"
 }
 */
 type WebhookIn struct {
-	ID              bson.ObjectId
+	ID              bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	WebhookURL      string
 	BaseCurrency    string
 	TargetCurrency  string
@@ -32,7 +32,7 @@ type WebhookIn struct {
 }
 */
 type WebhookOut struct {
-	ID              bson.ObjectId
+	ID              bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	BaseCurrency    string
 	TargetCurrency  string
 	CurrentRate     float64

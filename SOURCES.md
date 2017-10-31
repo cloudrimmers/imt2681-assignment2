@@ -1,4 +1,6 @@
 ##31.10.17
+golang with mgo example - https://gist.github.com/congjf/8035830
+bson _id - https://stackoverflow.com/a/35365246
 httpstatuses - https://httpstatuses.com/
 database not available status - https://stackoverflow.com/a/1434330
 bson.NewObjectID - https://stackoverflow.com/a/22498338

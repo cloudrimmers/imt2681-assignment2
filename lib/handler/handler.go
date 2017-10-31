@@ -6,10 +6,11 @@ import (
 	"log"
 	"net/http"
 
+	"gopkg.in/mgo.v2/bson"
+
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
 	"github.com/Arxcis/imt2681-assignment2/lib/mytypes"
 	"github.com/gorilla/mux"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // HelloWorld ...
@@ -24,7 +25,6 @@ func PostWebhook(w http.ResponseWriter, r *http.Request) {
 
 	webhook := &mytypes.WebhookIn{}
 	_ = json.NewDecoder(r.Body).Decode(webhook)
-	fmt.Println(webhook)
 
 	db, err := database.Open()
 	if err != nil {
@@ -41,14 +41,15 @@ func PostWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(webhook.ID))
+	text, _ := webhook.ID.MarshalText()
+	log.Println("ID: ", text)
+	w.Write(text)
 }
 
 // GetWebhook ...
 func GetWebhook(w http.ResponseWriter, r *http.Request) {
 
-	hook := mytypes.WebhookIn{}
-	hook.ID = bson.ObjectId(mux.Vars(r)["id"])
+	hook := &mytypes.WebhookIn{}
 
 	db, err := database.Open()
 	if err != nil {
@@ -57,8 +58,10 @@ func GetWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 	defer database.Close()
 
-	query := db.C("hook").FindId(hook.ID)
-	err = query.One(hook)
+	queryID := bson.ObjectIdHex(mux.Vars(r)["id"])
+	log.Println("GET - hook.id: ", queryID)
+
+	err = db.C("hook").FindId(queryID).One(hook)
 	if err != nil {
 		notFound(w, err)
 		return
