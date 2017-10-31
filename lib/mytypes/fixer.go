@@ -16,9 +16,9 @@ import "gopkg.in/mgo.v2/bson"
 }
 */
 type FixerIn struct {
-	ID        bson.ObjectId
-	Base      string
-	Datestamp string
-	Date      string `json:"date"`
-	Rates     map[string]float64
+	ID        bson.ObjectId      `json:"id" bson:"_id,omitempty"`
+	Base      string             `json:"base"`
+	Datestamp string             `json:"datestamp"`
+	Date      string             `json:"date"`
+	Rates     map[string]float64 `json:"rates"`
 }

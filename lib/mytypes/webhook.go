@@ -14,11 +14,11 @@ import "gopkg.in/mgo.v2/bson"
 */
 type WebhookIn struct {
 	ID              bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	WebhookURL      string
-	BaseCurrency    string
-	TargetCurrency  string
-	MinTriggerValue float64
-	MaxTriggerValue float64
+	WebhookURL      string        `json:"webhookURL"`
+	BaseCurrency    string        `json:"baseCurrency"`
+	TargetCurrency  string        `json:"targetCurrency"`
+	MinTriggerValue float64       `json:"minTriggerValue"`
+	MaxTriggerValue float64       `json:"maxTriggerValue"`
 }
 
 // WebhookOut ...
@@ -33,11 +33,11 @@ type WebhookIn struct {
 */
 type WebhookOut struct {
 	ID              bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	BaseCurrency    string
-	TargetCurrency  string
-	CurrentRate     float64
-	MinTriggerValue float64
-	MaxTriggerValue float64
+	BaseCurrency    string        `json:"baseCurrency"`
+	TargetCurrency  string        `json:"targetCurrency"`
+	CurrentRate     float64       `json:"currentRate"`
+	MinTriggerValue float64       `json:"minTriggerValue"`
+	MaxTriggerValue float64       `json:"maxTriggerValue"`
 }
 
 // CurrencyIn ...
@@ -48,6 +48,6 @@ type WebhookOut struct {
 }
 */
 type CurrencyIn struct {
-	BaseCurrency   string
-	TargetCurrency string
+	BaseCurrency   string `json:"baseCurrency"`
+	TargetCurrency string `json:"targetCurrency"`
 }
