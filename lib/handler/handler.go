@@ -77,16 +77,17 @@ func GetWebhook(w http.ResponseWriter, r *http.Request) {
 // GetWebhookAll ...
 func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 
-	/*	db, err := database.Open()
-		if err != nil {
-			serviceUnavailable(w, err)
-			return
-		}
-		defer database.Close()
-	*/
+	db, err := database.Open()
+	if err != nil {
+		serviceUnavailable(w, err)
+		return
+	}
+	defer database.Close()
+
 	w.Header().Add("content-type", "application/json")
 
 	hooks := []mytypes.WebhookIn{}
+	err = db.C("hook").Find(nil).All(&hooks)
 
 	data, _ := json.Marshal(hooks)
 	w.Write(data)
