@@ -1,15 +1,22 @@
 package mytypes
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 
-	"github.com/Arxcis/imt2681-assignment2/lib/mytypes"
 	"gopkg.in/mgo.v2/bson"
 )
 
-// Webhook ...
+var (
+	errorURL          = errors.New("invalid url format")
+	errorCurrency     = errors.New("invalid currency format")
+	errorTriggerValue = errors.New("invalid trigger value")
+)
+
+// Webhook central datastructure for the service
 /* Example:
 {
 	"webhookURL": "http://remoteUrl:8080/randomWebhookPath",
@@ -24,16 +31,17 @@ type Webhook struct {
 	WebhookURL      string        `json:"webhookURL"`
 	BaseCurrency    string        `json:"baseCurrency"`
 	TargetCurrency  string        `json:"targetCurrency"`
-	CurrentRate     float64       `json:"currentRate" bson:",omitempty"`
+	CurrentRate     float64       `json:"currentRate,omitempty" bson:",omitempty"`
 	MinTriggerValue float64       `json:"minTriggerValue"`
 	MaxTriggerValue float64       `json:"maxTriggerValue"`
 }
 
-// Trigger ...
-func (hook *mytypes.WebhookOut) Trigger() {
+// Trigger triggers a request to the webhook to the WebhookURL
+func (hook *Webhook) Trigger() {
 
 	data, _ := json.Marshal(hook) // @TODO this should actually be a webhookOut structure
-	req, _ := http.NewRequest("POST", hook.WebhookURL, &data)
+	reader := bytes.NewReader(data)
+	req, _ := http.NewRequest("POST", hook.WebhookURL, reader)
 	req.Header.Set("content-type", "application/json")
 
 	client := &http.Client{}
@@ -42,6 +50,11 @@ func (hook *mytypes.WebhookOut) Trigger() {
 		log.Println("Error triggering webhook..", err.Error())
 	}
 	defer resp.Body.Close()
+}
+
+// Validate the webhook data when in comes form the client
+func (hook *Webhook) Validate() {
+
 }
 
 // CurrencyIn ...
