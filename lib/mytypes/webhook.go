@@ -9,7 +9,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// WebhookIn ...
+// Webhook ...
 /* Example:
 {
 	"webhookURL": "http://remoteUrl:8080/randomWebhookPath",
@@ -19,36 +19,18 @@ import (
 	"maxTriggerValue": 2.55
 }
 */
-type WebhookIn struct {
+type Webhook struct {
 	ID              bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	WebhookURL      string        `json:"webhookURL"`
 	BaseCurrency    string        `json:"baseCurrency"`
 	TargetCurrency  string        `json:"targetCurrency"`
-	MinTriggerValue float64       `json:"minTriggerValue"`
-	MaxTriggerValue float64       `json:"maxTriggerValue"`
-}
-
-// WebhookOut ...
-/* Example:
-{
-	"baseCurrency": "EUR",
-	"targetCurrency": "NOK",
-	"currentRate": 2.75,
-	"minTriggerValue": 1.50,
-	"maxTriggerValue": 2.55
-}
-*/
-type WebhookOut struct {
-	ID              bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	BaseCurrency    string        `json:"baseCurrency"`
-	TargetCurrency  string        `json:"targetCurrency"`
-	CurrentRate     float64       `json:"currentRate"`
+	CurrentRate     float64       `json:"currentRate" bson:",omitempty"`
 	MinTriggerValue float64       `json:"minTriggerValue"`
 	MaxTriggerValue float64       `json:"maxTriggerValue"`
 }
 
 // Trigger ...
-func (hook *mytypes.WebhookIn) Trigger() {
+func (hook *mytypes.WebhookOut) Trigger() {
 
 	data, _ := json.Marshal(hook) // @TODO this should actually be a webhookOut structure
 	req, _ := http.NewRequest("POST", hook.WebhookURL, &data)

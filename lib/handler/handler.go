@@ -172,8 +172,16 @@ func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 	hooks := []mytypes.WebhookIn{}
 	db.C("hook").Find(nil).All(&hooks)
 
-	for _, hook := range hooks {
-		go hook.Trigger()
+	for i, hook := range hooks {
+
+		fixer := mytypes.FixerIn{}
+		err = db.C("tick").Find(bson.M{"datestamp": tool.Todaystamp()}).One(&fixer)
+		if err == nil {
+			hook.CurrentRate = fixer.Rates[hook.TargetCurrency]
+			go hook.Trigger()
+		} else {
+			log.Println("webhook ", i, " not triggered..")
+		}
 	}
 }
 
