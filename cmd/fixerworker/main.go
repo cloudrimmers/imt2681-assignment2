@@ -9,9 +9,25 @@ import (
 
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
 
-	"github.com/Arxcis/imt2681-assignment2/lib/mytypes"
 	"github.com/Arxcis/imt2681-assignment2/lib/tool"
+	"github.com/Arxcis/imt2681-assignment2/lib/types"
 )
+
+func main() {
+
+	log.Println("Initializing ticker....")
+
+	// @doc https://stackoverflow.com/a/35009735
+	// fixer2mongo(os.Getenv("FIXERIO_URI")) // Seed database
+
+	for {
+		ticker := time.NewTicker(tool.UntilTomorrow())
+		<-ticker.C // Wait
+		ticker.Stop()
+
+		fixer2mongo(os.Getenv("FIXERIO_URI"))
+	}
+}
 
 func fixer2mongo(fixerURI string) {
 
@@ -23,7 +39,7 @@ func fixer2mongo(fixerURI string) {
 	}
 
 	// 2. Decode payload
-	payload := &(mytypes.FixerIn{})
+	payload := &(types.FixerIn{})
 	err = json.NewDecoder(resp.Body).Decode(payload)
 	if err != nil {
 		log.Println("Could not decode resp.Body...", err.Error())
@@ -48,20 +64,4 @@ func fixer2mongo(fixerURI string) {
 	}
 
 	log.Print("Tick success: ", payload.Datestamp)
-}
-
-func main() {
-
-	log.Println("Initializing ticker....")
-
-	// @doc https://stackoverflow.com/a/35009735
-	// fixer2mongo(os.Getenv("FIXERIO_URI")) // Seed database
-
-	for {
-		ticker := time.NewTicker(tool.UntilTomorrow())
-		<-ticker.C // Wait
-		ticker.Stop()
-
-		fixer2mongo(os.Getenv("FIXERIO_URI"))
-	}
 }

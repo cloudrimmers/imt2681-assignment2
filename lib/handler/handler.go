@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
-	"github.com/Arxcis/imt2681-assignment2/lib/mytypes"
 	"github.com/Arxcis/imt2681-assignment2/lib/tool"
+	"github.com/Arxcis/imt2681-assignment2/lib/types"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -24,7 +24,7 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 // POST    /api/v1/subscription/   create a subscription
 func PostWebhook(w http.ResponseWriter, r *http.Request) {
 
-	webhook := &mytypes.WebhookIn{}
+	webhook := &types.WebhookIn{}
 	_ = json.NewDecoder(r.Body).Decode(webhook)
 
 	db, err := database.Open()
@@ -50,7 +50,7 @@ func PostWebhook(w http.ResponseWriter, r *http.Request) {
 // GetWebhook ...
 func GetWebhook(w http.ResponseWriter, r *http.Request) {
 
-	hook := &mytypes.WebhookIn{}
+	hook := &types.WebhookIn{}
 
 	db, err := database.Open()
 	if err != nil {
@@ -87,7 +87,7 @@ func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("content-type", "application/json")
 
-	hooks := []mytypes.WebhookIn{}
+	hooks := []types.WebhookIn{}
 	err = db.C("hook").Find(nil).All(&hooks)
 	if err != nil {
 		notFound(w, err)
@@ -101,7 +101,7 @@ func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 // GetLatestCurrency ...
 func GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 
-	latest := &mytypes.CurrencyIn{}
+	latest := &types.CurrencyIn{}
 	err := json.NewDecoder(r.Body).Decode(latest)
 	if err != nil {
 		badRequest(w, err)
@@ -115,7 +115,7 @@ func GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 	}
 	defer database.Close()
 
-	fixer := &mytypes.FixerIn{}
+	fixer := &types.FixerIn{}
 	err = db.C("tick").Find(bson.M{"datestamp": tool.Todaystamp()}).One(fixer)
 	if err != nil {
 		notFound(w, err)
@@ -127,7 +127,7 @@ func GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 // GetAverageCurrency ...
 func GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 
-	latest := &mytypes.CurrencyIn{}
+	latest := &types.CurrencyIn{}
 	_ = json.NewDecoder(r.Body).Decode(latest)
 
 	db, err := database.Open()
@@ -142,7 +142,7 @@ func GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 	var average float64
 
 	for i := 0; i < dayCount; i++ {
-		fixer := mytypes.FixerIn{}
+		fixer := types.FixerIn{}
 		err = db.C("tick").Find(bson.M{"datestamp": tool.Daystamp(i)}).One(&fixer)
 
 		log.Println("i: ", i, "data: ", tool.Daystamp(i), fixer, latest.BaseCurrency)
@@ -169,12 +169,12 @@ func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 	}
 	defer database.Close()
 
-	hooks := []mytypes.WebhookIn{}
+	hooks := []types.Webhook{}
 	db.C("hook").Find(nil).All(&hooks)
 
 	for i, hook := range hooks {
 
-		fixer := mytypes.FixerIn{}
+		fixer := types.FixerIn{}
 		err = db.C("tick").Find(bson.M{"datestamp": tool.Todaystamp()}).One(&fixer)
 		if err == nil {
 			hook.CurrentRate = fixer.Rates[hook.TargetCurrency]
@@ -183,24 +183,4 @@ func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 			log.Println("webhook ", i, " not triggered..")
 		}
 	}
-}
-
-func serviceUnavailable(w http.ResponseWriter, err error) {
-	log.Println("No database connection: ", err.Error())
-	http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
-}
-
-func internalServerError(w http.ResponseWriter, err error) {
-	log.Println("Collection.Insert() error", err.Error())
-	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-}
-
-func notFound(w http.ResponseWriter, err error) {
-	log.Println("Collection.Find() not found", err.Error())
-	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-}
-
-func badRequest(w http.ResponseWriter, err error) {
-	log.Println("Http bad request", err.Error())
-	http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 }
