@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
@@ -15,13 +14,10 @@ import (
 )
 
 var config *types.WebConfig = (&types.WebConfig{}).Load()
-var basepath string
 
 func main() {
 
-	basepath, _ = filepath.Abs(filepath.Dir(os.Args[0]))
 	log.Println("Initializing ticker...")
-	log.Println("basepath: ", basepath)
 
 	database.EnsureFixerIndex(config.CollectionFixer) // @note you may only do this when needed
 	// database.SeedFixer(config.CollectionFixer)     // @note only do this when needed

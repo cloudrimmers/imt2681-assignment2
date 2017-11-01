@@ -3,8 +3,9 @@ package types
 import (
 	"encoding/json"
 	"io/ioutil"
-	"path"
-	"runtime"
+	"log"
+	"os"
+	"path/filepath"
 )
 
 // WebConfig configures the web-server from the config.json
@@ -16,10 +17,11 @@ type WebConfig struct {
 
 // Load the settings file to configure settings
 func (v *WebConfig) Load() *WebConfig {
+	basepath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 
-	_, filename, _, _ := runtime.Caller(0)
+	data, err := ioutil.ReadFile(basepath + "/webconfig.json")
+	log.Println("loading config from : ", basepath+"/webconfig.json")
 
-	data, err := ioutil.ReadFile(path.Dir(filename) + "/webconfig.json")
 	if err != nil {
 		panic(err.Error())
 	}

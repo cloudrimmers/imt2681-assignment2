@@ -5,8 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path"
-	"runtime"
+	"path/filepath"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
 	"gopkg.in/mgo.v2"
@@ -51,11 +50,12 @@ func SeedFixer(collectionFixer string) {
 	}
 	defer Close()
 
-	_, filename, _, _ := runtime.Caller(0)
+	// 2. Read from file
+	basepath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	data, err := ioutil.ReadFile(basepath + "/seedfixer.json")
+	log.Println("loading seed data from ", basepath+"/seedfixer.json")
 	fixerData := []types.FixerIn{}
 
-	// 2. Read from file
-	data, err := ioutil.ReadFile(path.Dir(filename) + "/seedfixer.json")
 	if err != nil {
 		panic(err.Error())
 	}
