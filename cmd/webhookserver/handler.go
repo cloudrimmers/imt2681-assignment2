@@ -26,9 +26,14 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 // POST    /api/v1/subscription/   create a subscription
 func PostWebhook(w http.ResponseWriter, r *http.Request) {
 
+	// 0. Decode webook
 	webhook := &types.Webhook{}
-	_ = json.NewDecoder(r.Body).Decode(webhook)
+	if errDecode := json.NewDecoder(r.Body).Decode(webhook); errDecode != nil {
+		internalServerError(w, errDecode)
+		return
+	}
 
+	// 1. Open database
 	db, err := database.Open()
 	if err != nil {
 		serviceUnavailable(w, err)
@@ -36,6 +41,13 @@ func PostWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 	defer database.Close()
 
+	// 2. Validate webhook
+	if err = tool.ValidateWebhook(webhook, config); err != nil {
+		badRequest(w, err)
+		return
+	}
+
+	// 3. Insert webhook
 	webhook.ID = bson.NewObjectId()
 	err = db.C(config.CollectionWebhook).Insert(webhook)
 	if err != nil {
