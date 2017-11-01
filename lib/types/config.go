@@ -17,6 +17,7 @@ type WebConfig struct {
 
 // Load the settings file to configure settings
 func (v *WebConfig) Load() *WebConfig {
+
 	basepath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 
 	data, err := ioutil.ReadFile(basepath + "/webconfig.json")

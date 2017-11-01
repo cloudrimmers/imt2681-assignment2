@@ -1,13 +1,7 @@
 package types
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
-	"log"
-	"net/http"
-
-	"gopkg.in/mgo.v2"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -35,29 +29,6 @@ type Webhook struct {
 	CurrentRate     float64       `json:"currentRate,omitempty" bson:",omitempty"`
 	MinTriggerValue float64       `json:"minTriggerValue"`
 	MaxTriggerValue float64       `json:"maxTriggerValue"`
-}
-
-// Trigger triggers a request to the webhook to the WebhookURL
-func (hook *Webhook) Trigger(collectionFixer *mgo.Collection) {
-
-	fixer := FixerIn{}
-	err := collectionFixer.Find(bson.M{"base": hook.BaseCurrency}).Sort("-date").One(&fixer)
-	if err != nil {
-		panic("No hook.baseCurrency found in the database!")
-	}
-	hook.CurrentRate = fixer.Rates[hook.TargetCurrency]
-
-	data, _ := json.Marshal(hook) // @TODO this should actually be a webhookOut structure
-	reader := bytes.NewReader(data)
-	req, _ := http.NewRequest("POST", hook.WebhookURL, reader)
-	req.Header.Set("content-type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Println("Error triggering webhook..", err.Error())
-	}
-	defer resp.Body.Close()
 }
 
 // CurrencyIn ...

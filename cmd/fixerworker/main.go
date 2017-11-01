@@ -27,6 +27,8 @@ func main() {
 	targetWait := -tool.UntilTomorrow()
 	log.Println("T wait  : ", targetWait.String())
 
+	fixer2mongo(os.Getenv("FIXERIO_URI"))
+
 	for _ = range ticker.C {
 		targetWait += time.Minute
 
@@ -70,7 +72,7 @@ func fixer2mongo(fixerURI string) {
 	err = db.C(config.CollectionFixer).Insert(payload)
 	if err != nil {
 		log.Println("Error on db.Insert():\n", err.Error())
-		return
+
 	}
 	log.Println("Successfull grab of fixer.io: ", payload)
 
