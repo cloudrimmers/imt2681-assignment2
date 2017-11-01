@@ -7,6 +7,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Arxcis/imt2681-assignment2/lib/types"
+	"gopkg.in/mgo.v2"
+
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -36,7 +39,14 @@ type Webhook struct {
 }
 
 // Trigger triggers a request to the webhook to the WebhookURL
-func (hook *Webhook) Trigger() {
+func (hook *Webhook) Trigger(collectionFixer *mgo.Collection) {
+
+	fixer := types.FixerIn{}
+	err := collectionFixer.Find(bson.M{"base": hook.BaseCurrency}).Sort("-date").One(&fixer)
+	if err != nil {
+		panic("No hook.baseCurrency found in the database!")
+	}
+	hook.CurrentRate = fixer.Rates[hook.TargetCurrency]
 
 	data, _ := json.Marshal(hook) // @TODO this should actually be a webhookOut structure
 	reader := bytes.NewReader(data)
