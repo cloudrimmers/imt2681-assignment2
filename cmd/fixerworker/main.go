@@ -74,7 +74,7 @@ func fixer2mongo(fixerURI string) {
 		log.Println("Error on db.Insert():\n", err.Error())
 		return
 	}
-	log.Println("Successfull grab of fixer.io: ", payload.Datestamp)
+	log.Println("Successfull grab of fixer.io: ", payload)
 
 	// 6. Fire webhooks
 	tool.FireWebhooks(db.C(config.CollectionWebhook), db.C(config.CollectionFixer))
