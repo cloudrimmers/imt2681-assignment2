@@ -74,6 +74,7 @@ func GetWebhook(w http.ResponseWriter, r *http.Request) {
 	defer database.Close()
 
 	queryID := bson.ObjectIdHex(mux.Vars(r)["id"])
+
 	log.Println("GET - hook.id: ", queryID)
 
 	err = db.C(config.CollectionWebhook).FindId(queryID).One(hook)

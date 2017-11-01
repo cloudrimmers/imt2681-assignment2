@@ -31,6 +31,11 @@ type Webhook struct {
 	MaxTriggerValue float64       `json:"maxTriggerValue"`
 }
 
+// WithinBounds ...
+func (hook *Webhook) WithinBounds() bool {
+	return hook.CurrentRate <= hook.MaxTriggerValue && hook.MinTriggerValue >= hook.CurrentRate
+}
+
 // CurrencyIn ...
 /* Example:
 {

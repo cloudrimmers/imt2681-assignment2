@@ -11,9 +11,9 @@ import (
 func main() {
 	log.Println("Initializing server....")
 
-	router := mux.NewRouter().StrictSlash(true)
-	apiBase := os.Getenv("API_VERSION_PATH")
 	port := os.Getenv("PORT")
+	apiBase := os.Getenv("API_VERSION_PATH")
+	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/", HelloWorld).Methods("GET")
 	router.HandleFunc(apiBase+"/hook", PostWebhook).Methods("POST")
