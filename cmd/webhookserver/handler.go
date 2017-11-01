@@ -115,8 +115,8 @@ func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 // GetLatestCurrency ...
 func GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 
-	latest := &types.CurrencyIn{}
-	err := json.NewDecoder(r.Body).Decode(latest)
+	reqQuery := &types.CurrencyIn{}
+	err := json.NewDecoder(r.Body).Decode(reqQuery)
 	if err != nil {
 		badRequest(w, err)
 		return
@@ -128,22 +128,22 @@ func GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer database.Close()
-
-	fixer := &types.FixerIn{}
-	err = db.C(config.CollectionFixer).Find(bson.M{"datestamp": tool.Todaystamp()}).One(fixer)
+	fixer := types.FixerIn{}
+	err = db.C(config.CollectionFixer).Find(bson.M{"base": reqQuery.BaseCurrency}).Sort("-date").One(&fixer)
 	if err != nil {
 		notFound(w, err)
 		return
 	}
-	fmt.Fprintf(w, "%.2f", fixer.Rates[latest.TargetCurrency])
+	fmt.Fprintf(w, "%.2f", fixer.Rates[reqQuery.TargetCurrency])
 }
 
 // GetAverageCurrency ...
 func GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 
-	latest := &types.CurrencyIn{}
-	_ = json.NewDecoder(r.Body).Decode(latest)
+	request := &types.CurrencyIn{}
+	_ = json.NewDecoder(r.Body).Decode(request)
 
+	// 1. Open database
 	db, err := database.Open()
 	if err != nil {
 		serviceUnavailable(w, err)
@@ -151,21 +151,19 @@ func GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 	}
 	defer database.Close()
 
-	// @note look 3 days back
+	// 2. Find sorted on date descending
 	const dayCount int = 3
 	var average float64
+	fixerArray := []types.FixerIn{}
+	err = db.C(config.CollectionFixer).Find(bson.M{"base": request.BaseCurrency}).Sort("-date").Limit(dayCount).All(&fixerArray)
+	if err != nil {
+		notFound(w, err)
+		return
+	}
 
-	for i := 0; i < dayCount; i++ {
-		fixer := types.FixerIn{}
-		err = db.C(config.CollectionFixer).Find(bson.M{"datestamp": tool.Daystamp(i)}).One(&fixer)
-
-		log.Println("i: ", i, "data: ", tool.Daystamp(i), fixer, latest.BaseCurrency)
-
-		if err != nil {
-			notFound(w, err)
-			return
-		}
-		average += fixer.Rates[latest.TargetCurrency]
+	// 3. Average last 3 days
+	for _, fixer := range fixerArray {
+		average += fixer.Rates[request.TargetCurrency]
 	}
 	average /= float64(dayCount)
 
@@ -186,15 +184,16 @@ func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 	hooks := []types.Webhook{}
 	db.C(config.CollectionWebhook).Find(nil).All(&hooks)
 
-	for i, hook := range hooks {
+	collection := db.C(config.CollectionFixer)
+	for _, hook := range hooks {
 
 		fixer := types.FixerIn{}
-		err = db.C(config.CollectionFixer).Find(bson.M{"datestamp": tool.Todaystamp()}).One(&fixer)
-		if err == nil {
-			hook.CurrentRate = fixer.Rates[hook.TargetCurrency]
-			go hook.Trigger()
-		} else {
-			log.Println("webhook ", i, " not triggered..")
+		err = collection.Find(bson.M{"base": hook.BaseCurrency}).Sort("-date").One(&fixer)
+		if err != nil {
+			notFound(w, err)
+			return
 		}
+		hook.CurrentRate = fixer.Rates[hook.TargetCurrency]
+		go hook.Trigger()
 	}
 }

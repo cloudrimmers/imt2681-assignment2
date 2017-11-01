@@ -34,6 +34,7 @@ func EnsureFixerIndex(collectionFixer string) {
 		Unique:   true,
 		DropDups: true,
 	}
+
 	err = db.C(collectionFixer).EnsureIndex(index)
 	if err != nil {
 		log.Println(err.Error())
@@ -68,7 +69,6 @@ func SeedFixer(collectionFixer string) {
 			log.Println("Unable to db.Insert seed")
 		}
 	}
-
 }
 
 // Open ...

@@ -20,14 +20,10 @@ func main() {
 	database.EnsureFixerIndex(config.CollectionFixer)
 	database.SeedFixer(config.CollectionFixer)
 	// @doc https://stackoverflow.com/a/35009735
-	//fixer2mongo(os.Getenv("FIXERIO_URI")) // Seed database
 	log.Println("Initializing ticker...")
 
 	for {
-		ticker := time.NewTicker(tool.UntilTomorrow())
-		<-ticker.C // Wait
-		ticker.Stop()
-
+		time.Sleep(tool.UntilTomorrow())
 		fixer2mongo(os.Getenv("FIXERIO_URI"))
 	}
 }
