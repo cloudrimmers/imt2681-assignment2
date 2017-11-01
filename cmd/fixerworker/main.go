@@ -24,20 +24,16 @@ func main() {
 	// @doc https://stackoverflow.com/a/35009735
 
 	ticker := time.NewTicker(time.Minute)
-	targetWait := tool.UntilTomorrow()
-	var currentWait time.Duration
-	log.Println("Current wait : ", currentWait.String())
-	log.Println("Target wait  : ", targetWait.String())
+	targetWait := -tool.UntilTomorrow()
+	log.Println("T wait  : ", targetWait.String())
 
 	for _ = range ticker.C {
-		currentWait += time.Minute
+		targetWait += time.Minute
 
-		log.Println("Current wait : ", currentWait.String())
-		log.Println("Target wait  : ", targetWait.String())
+		log.Println("T wait  : ", targetWait.String())
 
-		if currentWait >= targetWait {
-			targetWait = tool.UntilTomorrow()
-			currentWait = 0
+		if targetWait > 0 {
+			targetWait = -tool.UntilTomorrow()
 			fixer2mongo(os.Getenv("FIXERIO_URI"))
 		}
 	}
