@@ -17,14 +17,27 @@ var config *types.WebConfig = (&types.WebConfig{}).Load()
 
 func main() {
 
-	database.EnsureFixerIndex(config.CollectionFixer)
-	database.SeedFixer(config.CollectionFixer)
+	database.EnsureFixerIndex(config.CollectionFixer) // @note you may only do this when needed
+	// database.SeedFixer(config.CollectionFixer)     // @note only do this when needed
 	// @doc https://stackoverflow.com/a/35009735
 	log.Println("Initializing ticker...")
 
-	for {
-		time.Sleep(tool.UntilTomorrow())
-		fixer2mongo(os.Getenv("FIXERIO_URI"))
+	ticker := time.NewTicker(time.Minute)
+	targetWait := tool.UntilTomorrow()
+	var currentWait time.Duration
+	log.Println("Current wait : ", currentWait.String())
+	log.Println("Target wait  : ", targetWait.String())
+	for _ = range ticker.C {
+		currentWait += time.Minute
+
+		log.Println("Current wait : ", currentWait.String())
+		log.Println("Target wait  : ", targetWait.String())
+
+		if currentWait >= targetWait {
+			targetWait = tool.UntilTomorrow()
+			currentWait = 0
+			fixer2mongo(os.Getenv("FIXERIO_URI"))
+		}
 	}
 }
 
@@ -52,8 +65,7 @@ func fixer2mongo(fixerURI string) {
 	}
 	defer database.Close()
 
-	// 4. Generate datestamp
-	payload.Datestamp = tool.Todaystamp()
+	payload.Timestamp = time.Now().String()
 
 	// 5. Dump payload to database
 	log.Println(config.CollectionFixer)
@@ -62,9 +74,8 @@ func fixer2mongo(fixerURI string) {
 		log.Println("Error on db.Insert():\n", err.Error())
 		return
 	}
+	log.Println("Successfull grab of fixer.io: ", payload.Datestamp)
 
 	// 6. Fire webhooks
 	tool.FireWebhooks(db.C(config.CollectionWebhook), db.C(config.CollectionFixer))
-
-	log.Print("Tick success: ", payload.Datestamp)
 }
