@@ -1,6 +1,7 @@
 package database
 
 import (
+	"log"
 	"os"
 
 	"gopkg.in/mgo.v2"
@@ -12,10 +13,26 @@ var session *mgo.Session
 var err error
 
 // EnsureFixerIndex ...
-func EnsureFixerIndex() {}
+func EnsureFixerIndex() {
 
-// EnsureWebhookIndex ...
-func EnsureWebhookIndex() {}
+	// 1. Open database
+	log.Println("Ensuring unique fixer index...")
+	db, err := Open()
+	if err != nil {
+		log.Println(err.Error())
+	}
+	defer Close()
+
+	index := mgo.Index{
+		Key:      []string{"date"},
+		Unique:   true,
+		DropDups: true,
+	}
+	err = db.C("tick").EnsureIndex(index)
+	if err != nil {
+		log.Println(err.Error())
+	}
+}
 
 // Open ...
 func Open() (*mgo.Database, error) {

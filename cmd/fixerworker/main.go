@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
-	mgo "gopkg.in/mgo.v2"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/tool"
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
@@ -16,24 +15,7 @@ import (
 
 func main() {
 
-	// Make sure index is set
-	log.Println("Ensuring unique index...")
-	db, err := database.Open()
-	if err != nil {
-		log.Println(err.Error())
-	}
-
-	index := mgo.Index{
-		Key:      []string{"date"},
-		Unique:   true,
-		DropDups: true,
-	}
-	err = db.C("tick").EnsureIndex(index)
-	if err != nil {
-		log.Println(err.Error())
-	}
-
-	database.Close()
+	database.EnsureFixerIndex()
 
 	// @doc https://stackoverflow.com/a/35009735
 	fixer2mongo(os.Getenv("FIXERIO_URI")) // Seed database

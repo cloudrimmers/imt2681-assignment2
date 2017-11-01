@@ -11,8 +11,6 @@ import (
 // WebConfig configures the web-server from the config.json
 type WebConfig struct {
 	Currencies        []string
-	MinTrigger        float64
-	MaxTrigger        float64
 	CollectionWebhook string
 	CollectionTick    string
 }
