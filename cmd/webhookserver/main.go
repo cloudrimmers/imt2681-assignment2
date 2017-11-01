@@ -15,7 +15,7 @@ func main() {
 	apiBase := os.Getenv("API_VERSION_PATH")
 	port := os.Getenv("PORT")
 
-	//router.HandleFunc("/", HelloWorld).Methods("GET")
+	router.HandleFunc("/", HelloWorld).Methods("GET")
 	router.HandleFunc(apiBase+"/hook", PostWebhook).Methods("POST")
 	router.HandleFunc(apiBase+"/hook", GetWebhookAll).Methods("GET")
 	router.HandleFunc(apiBase+"/hook/{id}", GetWebhook).Methods("GET")
