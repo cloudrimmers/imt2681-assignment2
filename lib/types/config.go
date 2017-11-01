@@ -3,7 +3,6 @@ package types
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"path"
 	"runtime"
 )
@@ -12,7 +11,7 @@ import (
 type WebConfig struct {
 	Currencies        []string
 	CollectionWebhook string
-	CollectionTick    string
+	CollectionFixer   string
 }
 
 // Load the settings file to configure settings
@@ -28,6 +27,6 @@ func (v *WebConfig) Load() *WebConfig {
 	if err = json.Unmarshal(data, &v); err != nil {
 		panic(err.Error())
 	}
-	log.Println("Validation settings file: ", v)
+	//	log.Println("Validation settings file: ", v)
 	return v
 }

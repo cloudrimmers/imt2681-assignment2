@@ -34,5 +34,5 @@
         "ZAR"
     ],
     "collectionWebhook": "webhook",
-    "cllectionTick":"tick"
+    "collectionFixer":"fixer"
 }

@@ -13,12 +13,14 @@ import (
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
 )
 
+var config *types.WebConfig = (&types.WebConfig{}).Load()
+
 func main() {
 
-	database.EnsureFixerIndex()
-
+	database.EnsureFixerIndex(config.CollectionFixer)
+	database.SeedFixer(config.CollectionFixer)
 	// @doc https://stackoverflow.com/a/35009735
-	fixer2mongo(os.Getenv("FIXERIO_URI")) // Seed database
+	//fixer2mongo(os.Getenv("FIXERIO_URI")) // Seed database
 	log.Println("Initializing ticker...")
 
 	for {
@@ -58,7 +60,8 @@ func fixer2mongo(fixerURI string) {
 	payload.Datestamp = tool.Todaystamp()
 
 	// 5. Dump payload to database
-	err = db.C("tick").Insert(payload)
+	log.Println(config.CollectionFixer)
+	err = db.C(config.CollectionFixer).Insert(payload)
 	if err != nil {
 		log.Println("Error on db.Insert():\n", err.Error())
 		return

@@ -130,7 +130,7 @@ func GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 	defer database.Close()
 
 	fixer := &types.FixerIn{}
-	err = db.C(config.CollectionTick).Find(bson.M{"datestamp": tool.Todaystamp()}).One(fixer)
+	err = db.C(config.CollectionFixer).Find(bson.M{"datestamp": tool.Todaystamp()}).One(fixer)
 	if err != nil {
 		notFound(w, err)
 		return
@@ -157,7 +157,7 @@ func GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 
 	for i := 0; i < dayCount; i++ {
 		fixer := types.FixerIn{}
-		err = db.C(config.CollectionTick).Find(bson.M{"datestamp": tool.Daystamp(i)}).One(&fixer)
+		err = db.C(config.CollectionFixer).Find(bson.M{"datestamp": tool.Daystamp(i)}).One(&fixer)
 
 		log.Println("i: ", i, "data: ", tool.Daystamp(i), fixer, latest.BaseCurrency)
 
@@ -189,7 +189,7 @@ func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 	for i, hook := range hooks {
 
 		fixer := types.FixerIn{}
-		err = db.C(config.CollectionTick).Find(bson.M{"datestamp": tool.Todaystamp()}).One(&fixer)
+		err = db.C(config.CollectionFixer).Find(bson.M{"datestamp": tool.Todaystamp()}).One(&fixer)
 		if err == nil {
 			hook.CurrentRate = fixer.Rates[hook.TargetCurrency]
 			go hook.Trigger()
