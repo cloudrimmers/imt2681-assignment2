@@ -19,6 +19,7 @@ func main() {
 	router.HandleFunc(apiBase+"/hook", PostWebhook).Methods("POST")
 	router.HandleFunc(apiBase+"/hook", GetWebhookAll).Methods("GET")
 	router.HandleFunc(apiBase+"/hook/{id}", GetWebhook).Methods("GET")
+	router.HandleFunc(apiBase+"/hook/{id}", DeleteWebhook).Methods("DELETE")
 	router.HandleFunc(apiBase+"/hook/evaluationtrigger", EvaluationTrigger).Methods("POST")
 
 	router.HandleFunc(apiBase+"/currency/latest", GetLatestCurrency).Methods("POST")

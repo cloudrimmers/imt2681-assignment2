@@ -27,7 +27,7 @@ func main() {
 	targetWait := -tool.UntilTomorrow()
 	log.Println("T wait  : ", targetWait.String())
 
-	fixer2mongo(os.Getenv("FIXERIO_URI"))
+	//	fixer2mongo(os.Getenv("FIXERIO_URI"))
 
 	for _ = range ticker.C {
 		targetWait += time.Minute

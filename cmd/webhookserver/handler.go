@@ -55,7 +55,7 @@ func PostWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 4. Write header
+	// 4. Write response
 	w.WriteHeader(http.StatusCreated)
 	text, _ := webhook.ID.MarshalText()
 	w.Write(text)
@@ -92,6 +92,7 @@ func GetWebhook(w http.ResponseWriter, r *http.Request) {
 // GetWebhookAll ...
 func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 
+	// 0. Open connection to database
 	db, err := database.Open()
 	if err != nil {
 		serviceUnavailable(w, err)
@@ -110,6 +111,29 @@ func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 
 	data, _ := json.Marshal(hooks)
 	w.Write(data)
+}
+
+// DeleteWebhook ...
+func DeleteWebhook(w http.ResponseWriter, r *http.Request) {
+
+	queryID := bson.ObjectIdHex(mux.Vars(r)["id"])
+
+	// 0. Open connection to database
+	db, err := database.Open()
+	if err != nil {
+		serviceUnavailable(w, err)
+		return
+	}
+	defer database.Close()
+
+	// 1. Remove
+	log.Println("deleting ", queryID)
+	err = db.C(config.CollectionWebhook).RemoveId(queryID)
+	if err != nil {
+		notFound(w, err)
+		return
+	}
+
 }
 
 // GetLatestCurrency ...
