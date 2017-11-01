@@ -55,9 +55,9 @@ func PostWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 4. Write header
 	w.WriteHeader(http.StatusCreated)
 	text, _ := webhook.ID.MarshalText()
-	log.Println("ID: ", text)
 	w.Write(text)
 }
 

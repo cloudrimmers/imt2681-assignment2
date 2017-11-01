@@ -11,6 +11,12 @@ var mongoDB string = os.Getenv("MONGODB_NAME")
 var session *mgo.Session
 var err error
 
+// EnsureFixerIndex ...
+func EnsureFixerIndex() {}
+
+// EnsureWebhookIndex ...
+func EnsureWebhookIndex() {}
+
 // Open ...
 func Open() (*mgo.Database, error) {
 	database := &mgo.Database{}
