@@ -181,19 +181,5 @@ func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 	}
 	defer database.Close()
 
-	hooks := []types.Webhook{}
-	db.C(config.CollectionWebhook).Find(nil).All(&hooks)
-
-	collection := db.C(config.CollectionFixer)
-	for _, hook := range hooks {
-
-		fixer := types.FixerIn{}
-		err = collection.Find(bson.M{"base": hook.BaseCurrency}).Sort("-date").One(&fixer)
-		if err != nil {
-			notFound(w, err)
-			return
-		}
-		hook.CurrentRate = fixer.Rates[hook.TargetCurrency]
-		go hook.Trigger()
-	}
+	tool.FireWebhooks(db.C(config.CollectionWebhook), db.C(config.CollectionFixer))
 }

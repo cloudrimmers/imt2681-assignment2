@@ -63,5 +63,8 @@ func fixer2mongo(fixerURI string) {
 		return
 	}
 
+	// 6. Fire webhooks
+	tool.FireWebhooks(db.C(config.CollectionWebhook), db.C(config.CollectionFixer))
+
 	log.Print("Tick success: ", payload.Datestamp)
 }
