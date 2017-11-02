@@ -23,12 +23,12 @@ func main() {
 	// database.SeedFixer(config.CollectionFixer)     // @note only do this when needed
 	// @doc https://stackoverflow.com/a/35009735
 
-	ticker := time.NewTicker(time.Minute)
 	targetWait := -tool.UntilTomorrow()
 	log.Println("T wait  : ", targetWait.String())
 
 	//	fixer2mongo(os.Getenv("FIXERIO_URI"))
 
+	ticker := time.NewTicker(time.Minute)
 	for _ = range ticker.C {
 		targetWait += time.Minute
 
