@@ -14,7 +14,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-var config *types.WebConfig = (&types.WebConfig{}).Load()
+var config = (&types.WebConfig{}).Load()
 
 // HelloWorld ...
 // Example: router.HandleFunc("/projectinfo/v1/github.com/{user}/{repo}", gitRepositoryHandler)

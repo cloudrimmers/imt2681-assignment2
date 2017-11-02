@@ -13,7 +13,7 @@ import (
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
 )
 
-var config *types.WebConfig = (&types.WebConfig{}).Load()
+var config = (&types.WebConfig{}).Load()
 
 func main() {
 
