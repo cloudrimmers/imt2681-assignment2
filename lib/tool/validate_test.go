@@ -1,10 +1,17 @@
 package tool
 
 import (
+	"log"
 	"testing"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
+	"github.com/subosito/gotenv"
 )
+
+func init() {
+	gotenv.MustLoad("../../.env")
+	log.Println("!!! GOTENV !!!")
+}
 
 func TestValidateWebhook(t *testing.T) {
 

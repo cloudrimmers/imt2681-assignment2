@@ -6,13 +6,19 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/subosito/gotenv"
 )
+
+func init() {
+	gotenv.MustLoad(".env")
+	log.Println("!!! GOTENV !!! ")
+}
 
 func main() {
 	log.Println("Initializing server....")
 
-	port := os.Getenv("PORT")
-	apiBase := os.Getenv("API_VERSION_PATH")
+	var port = os.Getenv("PORT")
+	var apiBase = os.Getenv("API_VERSION_PATH")
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/", HelloWorld).Methods("GET")

@@ -7,19 +7,23 @@ import (
 	"log"
 	"net/url"
 	"os"
-	"path/filepath"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
 )
 
+var currencies []string
+
+func init() {
+	currencies = loadCurrencies()
+}
+
 // Load the settings file to configure settings
 func loadCurrencies() []string {
 
-	basepath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	fullpath := basepath + os.Getenv("CURRENCY_PATH")
-	log.Println("loading ", fullpath)
+	//basepath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	fullpath := os.Getenv("CURRENCY_PATH")
 	data, err := ioutil.ReadFile(fullpath)
-	log.Println("loading config from : ", fullpath)
+	log.Println("loading config from : ", os.Getenv("CURRENCY_PATH"), fullpath)
 
 	if err != nil {
 		panic(err.Error())
@@ -31,8 +35,6 @@ func loadCurrencies() []string {
 	//	log.Println("Validation settings file: ", v)
 	return currencies
 }
-
-var currencies = loadCurrencies()
 
 func validateURI(URI string) error {
 	_, err := url.ParseRequestURI(URI)

@@ -8,10 +8,16 @@ import (
 	"time"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
+	"github.com/subosito/gotenv"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/tool"
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
 )
+
+func init() {
+	gotenv.MustLoad(".env")
+	log.Println("!!! GOTENV !!! ")
+}
 
 func main() {
 

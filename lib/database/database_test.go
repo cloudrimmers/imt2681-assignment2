@@ -1,7 +1,15 @@
 package database
 
-import "testing"
+import (
+	"testing"
 
+	"github.com/subosito/gotenv"
+)
+
+func init() {
+	gotenv.MustLoad("../../.env")
+
+}
 func TestDatabase(t *testing.T) {
 
 	_, err := Open()

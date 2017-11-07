@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
 	"gopkg.in/mgo.v2"
@@ -94,8 +93,8 @@ func SeedFixer() {
 	var seedPath = os.Getenv("SEED_PATH")
 
 	// 1. Read from file
-	basepath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	fullpath := basepath + seedPath
+	//basepath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	fullpath := seedPath
 	data, err := ioutil.ReadFile(fullpath)
 	log.Println("loading seed data from ", fullpath)
 	fixerData := []types.FixerIn{}
