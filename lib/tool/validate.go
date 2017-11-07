@@ -16,9 +16,10 @@ import (
 func loadCurrencies() []string {
 
 	basepath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-
-	data, err := ioutil.ReadFile(basepath + "/config/currency.json")
-	log.Println("loading config from : ", basepath+"/config/currency.json")
+	fullpath := basepath + os.Getenv("CURRENCY_PATH")
+	log.Println("loading ", fullpath)
+	data, err := ioutil.ReadFile(fullpath)
+	log.Println("loading config from : ", fullpath)
 
 	if err != nil {
 		panic(err.Error())

@@ -66,8 +66,7 @@ func fixer2mongo(fixerURI string) {
 	payload.Timestamp = time.Now().String()
 
 	// 5. Dump payload to database
-	log.Println(config.CollectionFixer)
-	err = db.C(config.CollectionFixer).Insert(payload)
+	err = db.C(os.Getenv("COLLECTION_FIXER")).Insert(payload)
 	if err != nil {
 		log.Println("Error on db.Insert():\n", err.Error())
 
