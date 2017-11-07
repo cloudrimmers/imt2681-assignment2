@@ -32,7 +32,5 @@
         "TRY",
         "USD",
         "ZAR"
-    ],
-    "collectionWebhook": "webhook",
-    "collectionFixer":"fixer"
+    ]
 }
