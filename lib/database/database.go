@@ -11,10 +11,41 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
-var mongoURI string = os.Getenv("MONGODB_URI")
-var mongoDB string = os.Getenv("MONGODB_NAME")
+var mongoURI = os.Getenv("MONGODB_URI")
+var mongoDB = os.Getenv("MONGODB_NAME")
+var collectionWebhook = os.Getenv("COLLECTION_WEBHOOK")
+var collectionFixer = os.Getenv("COLLECTION_FIXER")
+
 var session *mgo.Session
 var err error
+
+// OpenWebhook ...
+func OpenWebhook(db *mgo.Database) (*mgo.Collection, error) {
+
+	session, err = mgo.Dial(mongoURI)
+	if err != nil {
+		return nil, err
+	}
+	session.SetMode(mgo.Monotonic, true) // @note not sure what this is, but many people use it
+
+	return session.DB(mongoDB).C(collectionWebhook), nil
+}
+
+// OpenFixer ...
+func OpenFixer(db *mgo.Database) (*mgo.Collection, error) {
+	session, err = mgo.Dial(mongoURI)
+	if err != nil {
+		return nil, err
+	}
+	session.SetMode(mgo.Monotonic, true) // @note not sure what this is, but many people use it
+
+	return session.DB(mongoDB).C(collectionFixer), nil
+}
+
+// Close ...
+func Close() {
+	session.Close()
+}
 
 // EnsureFixerIndex ...
 func EnsureFixerIndex(collectionFixer string) {
@@ -69,22 +100,4 @@ func SeedFixer(collectionFixer string) {
 			log.Println("Unable to db.Insert seed")
 		}
 	}
-}
-
-// Open ...
-func Open() (*mgo.Database, error) {
-	database := &mgo.Database{}
-	session, err = mgo.Dial(mongoURI)
-
-	session.SetMode(mgo.Monotonic, true) // @note not sure what this is, but many people use it
-
-	if err == nil {
-		database = session.DB(mongoDB)
-	}
-	return database, err
-}
-
-// Close ...
-func Close() {
-	session.Close()
 }

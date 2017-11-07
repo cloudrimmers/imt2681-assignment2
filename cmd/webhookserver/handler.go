@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
+	"github.com/Arxcis/imt2681-assignment2/lib/httperror"
 	"github.com/Arxcis/imt2681-assignment2/lib/tool"
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
-
-var config = (&types.WebConfig{}).Load()
 
 // HelloWorld ...
 // Example: router.HandleFunc("/projectinfo/v1/github.com/{user}/{repo}", gitRepositoryHandler)
@@ -26,36 +26,32 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 // POST    /api/v1/subscription/   create a subscription
 func PostWebhook(w http.ResponseWriter, r *http.Request) {
 
-	// 0. Decode webook
+	// 1. Decode webook
 	webhook := &types.Webhook{}
-	if errDecode := json.NewDecoder(r.Body).Decode(webhook); errDecode != nil {
-		internalServerError(w, errDecode)
-		return
+	if err = json.NewDecoder(r.Body).Decode(webhook); err != nil {
+		return httperror.InternalServer(w, errDecode)
 	}
-
-	// 1. Open database
-	db, err := database.Open()
-	if err != nil {
-		serviceUnavailable(w, err)
-		return
-	}
-	defer database.Close()
 
 	// 2. Validate webhook
-	if err = tool.ValidateWebhook(webhook, config); err != nil {
-		badRequest(w, err)
-		return
+	if err = tool.ValidateWebhook(webhook); err != nil {
+		return httperror.BadRequest(w, err)
 	}
 
-	// 3. Insert webhook
-	webhook.ID = bson.NewObjectId()
-	err = db.C(config.CollectionWebhook).Insert(webhook)
+	// 3. Open database
+	dbwebhook, err := database.OpenWebhook()
+	defer database.Close()
 	if err != nil {
-		internalServerError(w, err)
-		return
+		return serviceUnavailable(w, err)
 	}
 
-	// 4. Write response
+	// 4. Insert webhook
+	webhook.ID = bson.NewObjectId()
+	dbwebhook.Insert(webhook)
+	if err != nil {
+		return internalServerError(w, err)
+	}
+
+	// 5. Write response
 	w.WriteHeader(http.StatusCreated)
 	text, _ := webhook.ID.MarshalText()
 	w.Write(text)
@@ -77,7 +73,8 @@ func GetWebhook(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("GET - hook.id: ", queryID)
 
-	err = db.C(config.CollectionWebhook).FindId(queryID).One(hook)
+	const COLLECTION_WEBHOOK = os.Getenv("COLLECTION_WEBHOOK")
+	err = db.C(COLLECTION_WEBHOOK).FindId(queryID).One(hook)
 	if err != nil {
 		notFound(w, err)
 		return
@@ -104,7 +101,8 @@ func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("content-type", "application/json")
 
 	hooks := []types.Webhook{}
-	err = db.C(config.CollectionWebhook).Find(nil).All(&hooks)
+	const COLLECTION_WEBHOOK = os.Getenv("COLLECTION_WEBHOOK")
+	err = db.C(COLLECTION_WEBHOOK).Find(nil).All(&hooks)
 	if err != nil {
 		notFound(w, err)
 		return
@@ -143,7 +141,7 @@ func GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 	reqQuery := &types.CurrencyIn{}
 	err := json.NewDecoder(r.Body).Decode(reqQuery)
 	if err != nil {
-		badRequest(w, err)
+		httperror.BadRequest(w, err)
 		return
 	}
 	db := &mgo.Database{}
@@ -154,7 +152,7 @@ func GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 	}
 	defer database.Close()
 	fixer := types.FixerIn{}
-	err = db.C(config.CollectionFixer).Find(bson.M{"base": reqQuery.BaseCurrency}).Sort("-date").One(&fixer)
+	err = db.C(COLLECTION_FIXER).Find(bson.M{"base": reqQuery.BaseCurrency}).Sort("-date").One(&fixer)
 	if err != nil {
 		notFound(w, err)
 		return

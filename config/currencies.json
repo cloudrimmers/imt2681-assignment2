@@ -1,5 +1,4 @@
-{
-    "currencies": [
+[
         "EUR",
         "AUD",
         "BGN",
@@ -31,6 +30,5 @@
         "THB",
         "TRY",
         "USD",
-        "ZAR"
-    ]
-}
+        "ZAR" 
+]
