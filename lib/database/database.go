@@ -11,16 +11,29 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
-var mongoURI = os.Getenv("MONGODB_URI")
-var mongoDB = os.Getenv("MONGODB_NAME")
-var collectionWebhook = os.Getenv("COLLECTION_WEBHOOK")
-var collectionFixer = os.Getenv("COLLECTION_FIXER")
-
 var session *mgo.Session
 var err error
 
+// Open ...
+func Open() (*mgo.Database, error) {
+
+	var mongoURI = os.Getenv("MONGODB_URI")
+	var mongoDB = os.Getenv("MONGODB_NAME")
+
+	session, err = mgo.Dial(mongoURI)
+	if err != nil {
+		return nil, err
+	}
+	session.SetMode(mgo.Monotonic, true) // @note not sure what this is, but many people use it
+	return session.DB(mongoDB), nil
+}
+
 // OpenWebhook ...
-func OpenWebhook(db *mgo.Database) (*mgo.Collection, error) {
+func OpenWebhook() (*mgo.Collection, error) {
+
+	var mongoURI = os.Getenv("MONGODB_URI")
+	var mongoDB = os.Getenv("MONGODB_NAME")
+	var collectionWebhook = os.Getenv("COLLECTION_WEBHOOK")
 
 	session, err = mgo.Dial(mongoURI)
 	if err != nil {
@@ -32,7 +45,12 @@ func OpenWebhook(db *mgo.Database) (*mgo.Collection, error) {
 }
 
 // OpenFixer ...
-func OpenFixer(db *mgo.Database) (*mgo.Collection, error) {
+func OpenFixer() (*mgo.Collection, error) {
+
+	var mongoURI = os.Getenv("MONGODB_URI")
+	var mongoDB = os.Getenv("MONGODB_NAME")
+	var collectionFixer = os.Getenv("COLLECTION_FIXER")
+
 	session, err = mgo.Dial(mongoURI)
 	if err != nil {
 		return nil, err
@@ -50,53 +68,59 @@ func Close() {
 // EnsureFixerIndex ...
 func EnsureFixerIndex(collectionFixer string) {
 
-	// 1. Open database
+	// 1. Open collection
 	log.Println("Ensuring unique fixer index...")
-	db, err := Open()
+	dbfixer, err := OpenFixer()
 	if err != nil {
 		log.Println(err.Error())
 		return
 	}
 	defer Close()
 
-	index := mgo.Index{
+	// 2. Add index
+	err = dbfixer.EnsureIndex(mgo.Index{
 		Key:      []string{"date"},
 		Unique:   true,
 		DropDups: true,
-	}
-
-	err = db.C(collectionFixer).EnsureIndex(index)
+	})
 	if err != nil {
 		log.Println(err.Error())
 	}
 }
 
 // SeedFixer ...
-func SeedFixer(collectionFixer string) {
-	// 1. Open database
-	db, err := Open()
+func SeedFixer() {
+
+	var seedPath = os.Getenv("SEED_PATH")
+
+	// 1. Read from file
+	basepath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	fullpath := basepath + seedPath
+	data, err := ioutil.ReadFile(fullpath)
+	log.Println("loading seed data from ", fullpath)
+	fixerData := []types.FixerIn{}
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// 2. Unmarshal
+	if err = json.Unmarshal(data, &fixerData); err != nil {
+		panic(err.Error())
+	}
+
+	// 3. Open collection
+	cfixer, err := OpenFixer()
 	if err != nil {
 		log.Println(err.Error())
 		return
 	}
 	defer Close()
 
-	// 2. Read from file
-	basepath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	data, err := ioutil.ReadFile(basepath + "/seedfixer.json")
-	log.Println("loading seed data from ", basepath+"/seedfixer.json")
-	fixerData := []types.FixerIn{}
-
-	if err != nil {
-		panic(err.Error())
-	}
-	if err = json.Unmarshal(data, &fixerData); err != nil {
-		panic(err.Error())
-	}
-	// 3. Insert to database
-	// db.C(collectionFixer).DropCollection()
+	// 4. Insert to database
+	// cfixer.DropCollection()
 	for _, fixer := range fixerData {
-		if err = db.C(collectionFixer).Insert(fixer); err != nil {
+		if err = cfixer.Insert(fixer); err != nil {
 			log.Println("Unable to db.Insert seed")
 		}
 	}
