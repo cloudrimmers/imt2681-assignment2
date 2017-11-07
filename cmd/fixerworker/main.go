@@ -77,5 +77,6 @@ func fixer2mongo(fixerURI string) {
 	log.Println("Successfull grab of fixer.io: ", payload)
 
 	// 6. Fire webhooks
-	tool.FireWebhooks(db.C(config.CollectionWebhook), db.C(config.CollectionFixer))
+	client := &http.Client{}
+	tool.InvokeWebhooks(client, db.C(os.Getenv("COLLECTION_WEBHOOK")), db.C(os.Getenv("COLLECTION_FIXER")))
 }

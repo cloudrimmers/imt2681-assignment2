@@ -11,8 +11,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// FireWebhooks ...
-func FireWebhooks(collectionWebhook *mgo.Collection, collectionFixer *mgo.Collection) {
+// InvokeWebhooks ...
+func InvokeWebhooks(client *http.Client, collectionWebhook *mgo.Collection, collectionFixer *mgo.Collection) {
 	hooks := []types.Webhook{}
 	collectionWebhook.Find(nil).All(&hooks)
 	for _, hook := range hooks {
@@ -48,7 +48,6 @@ func FireWebhooks(collectionWebhook *mgo.Collection, collectionFixer *mgo.Collec
 			log.Println("Fireing webhook: ", req, string(data))
 
 			// 4. Do request
-			client := &http.Client{}
 			resp, err := client.Do(req)
 			if err != nil {
 				log.Println("Error posting webhook..", err.Error())
