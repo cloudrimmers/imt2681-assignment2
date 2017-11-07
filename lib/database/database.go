@@ -66,7 +66,7 @@ func Close() {
 }
 
 // EnsureFixerIndex ...
-func EnsureFixerIndex(collectionFixer string) {
+func EnsureFixerIndex() {
 
 	// 1. Open collection
 	log.Println("Ensuring unique fixer index...")

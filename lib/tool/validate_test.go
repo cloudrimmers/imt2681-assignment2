@@ -53,31 +53,29 @@ func TestValidateWebhook(t *testing.T) {
 		},
 	}
 
-	config := (&types.WebConfig{}).Load()
-
 	// Correct
-	err := ValidateWebhook(&hooks[0], config)
+	err := ValidateWebhook(&hooks[0])
 	if err != nil {
 		t.Error("ValidateWebhook error 1: ", err.Error())
 	}
 
 	// Fails
-	err = ValidateWebhook(&hooks[1], config)
+	err = ValidateWebhook(&hooks[1])
 	if err == nil {
 		t.Error("ValidateWebhook error 2: ", err.Error())
 	}
 
-	err = ValidateWebhook(&hooks[2], config)
+	err = ValidateWebhook(&hooks[2])
 	if err == nil {
 		t.Error("ValidateWebhook error 3: ", err.Error())
 	}
 
-	err = ValidateWebhook(&hooks[3], config)
+	err = ValidateWebhook(&hooks[3])
 	if err == nil {
 		t.Error("ValidateWebhook error 4: ", err.Error())
 	}
 
-	err = ValidateWebhook(&hooks[4], config)
+	err = ValidateWebhook(&hooks[4])
 	if err == nil {
 		t.Error("ValidateWebhook error 5: ", err.Error())
 	}

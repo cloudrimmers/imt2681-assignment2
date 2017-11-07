@@ -18,7 +18,6 @@ import (
 var err error
 
 // HelloWorld ...
-// Example: router.HandleFunc("/projectinfo/v1/github.com/{user}/{repo}", gitRepositoryHandler)
 func HelloWorld(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello world")
 }
@@ -209,6 +208,7 @@ func GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 // EvaluationTrigger ...
 func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 
+	// 1. Open database
 	db, err := database.Open()
 	if err != nil {
 		httperror.ServiceUnavailable(w, err)
@@ -216,6 +216,7 @@ func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 	}
 	defer database.Close()
 
+	// 2. Invoke all webhooks
 	client := &http.Client{}
 	tool.InvokeWebhooks(client, db.C(os.Getenv("COLLECTION_WEBHOOK")), db.C(os.Getenv("COLLECTION_FIXER")))
 }

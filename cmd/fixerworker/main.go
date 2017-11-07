@@ -13,13 +13,11 @@ import (
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
 )
 
-var config = (&types.WebConfig{}).Load()
-
 func main() {
 
 	log.Println("Initializing ticker...")
 
-	database.EnsureFixerIndex(config.CollectionFixer) // @note you may only do this when needed
+	database.EnsureFixerIndex() // @note you may only do this when needed
 	// database.SeedFixer(config.CollectionFixer)     // @note only do this when needed
 	// @doc https://stackoverflow.com/a/35009735
 

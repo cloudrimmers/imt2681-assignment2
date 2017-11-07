@@ -24,7 +24,7 @@ func loadCurrencies() []string {
 		panic(err.Error())
 	}
 	var currencies []string
-	if err = json.Unmarshal(data, currencies); err != nil {
+	if err = json.Unmarshal(data, &currencies); err != nil {
 		panic(err.Error())
 	}
 	//	log.Println("Validation settings file: ", v)
