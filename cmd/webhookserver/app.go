@@ -15,16 +15,23 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// App ...
+type App struct {
+	collectionWebhook string
+	collectionFixer   string
+	name              string
+}
+
 var err error
 
 // HelloWorld ...
-func HelloWorld(w http.ResponseWriter, r *http.Request) {
+func (app *App) HelloWorld(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello world")
 }
 
 // PostWebhook ...
 // POST    /api/v1/subscription/   create a subscription
-func PostWebhook(w http.ResponseWriter, r *http.Request) {
+func (app *App) PostWebhook(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Decode webook
 	webhook := &types.Webhook{}
@@ -62,7 +69,7 @@ func PostWebhook(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetWebhook ...
-func GetWebhook(w http.ResponseWriter, r *http.Request) {
+func (app *App) GetWebhook(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Open collection
 	cwebhook, err := database.OpenWebhook()
@@ -90,7 +97,7 @@ func GetWebhook(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetWebhookAll ...
-func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
+func (app *App) GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Open collection
 	cwebhook, err := database.OpenWebhook()
@@ -115,7 +122,7 @@ func GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 }
 
 // DeleteWebhook ...
-func DeleteWebhook(w http.ResponseWriter, r *http.Request) {
+func (app *App) DeleteWebhook(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Open collection
 	cwebhook, err := database.OpenWebhook()
@@ -139,7 +146,7 @@ func DeleteWebhook(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetLatestCurrency ...
-func GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
+func (app *App) GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Decode request body
 	reqQuery := &types.CurrencyIn{}
@@ -170,7 +177,7 @@ func GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetAverageCurrency ...
-func GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
+func (app *App) GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Decode request body
 	request := &types.CurrencyIn{}
@@ -206,7 +213,7 @@ func GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 }
 
 // EvaluationTrigger ...
-func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
+func (app *App) EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Open database
 	db, err := database.Open()

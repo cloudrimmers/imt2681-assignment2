@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -14,25 +15,35 @@ import (
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
 )
 
+
+
+var APP *App
+var err error
+
 func init() {
 	gotenv.MustLoad(".env")
-	log.Println("!!! GOTENV !!! ")
+	APP = &App{
+		FixerioURI:        os.Getenv("FIXERIO_URI"),
+		SeedFixerPath:     os.Getenv("SEEDFIXER_PATH"),
+		CollectionWebhook: os.Getenv("COLLECTION_FIXER"),
+		CollectionFixer:   os.Getenv("COLLECTION_WEBHOOK"),
+		MongodbName:	   os.Getenv("MONGODB_NAME"),
+		MongodbURI:  	   os.Getenv("MONGODB_URI"),
+	}
+	mongo := database.Mongo{APP.MongodbName, APP.MongodbURI}
+	APP.SeedFixer(&mongo)	 // @note enable/disable
+	mongo.EnsureIndex(APP.CollectionFixer, []string{"date"})
+
+	log.Println("Fixer app initialized...")
 }
 
 func main() {
-
-	log.Println("Initializing ticker...")
-
-	database.EnsureFixerIndex() // @note you may only do this when needed
-	// database.SeedFixer(config.CollectionFixer)     // @note only do this when needed
 	// @doc https://stackoverflow.com/a/35009735
-
 	targetWait := -tool.UntilTomorrow()
-	log.Println("T wait  : ", targetWait.String())
-
-	//	fixer2mongo(os.Getenv("FIXERIO_URI"))
-
 	ticker := time.NewTicker(time.Minute)
+	mongo := database.Mongo{APP.MongodbName, APP.MongodbURI}
+	
+	log.Println("T wait  : ", targetWait.String())
 	for _ = range ticker.C {
 		targetWait += time.Minute
 
@@ -40,46 +51,7 @@ func main() {
 
 		if targetWait > 0 {
 			targetWait = -tool.UntilTomorrow()
-			fixer2mongo(os.Getenv("FIXERIO_URI"))
+			APP.Fixer2Mongo(&mongo)
 		}
 	}
-}
-
-func fixer2mongo(fixerURI string) {
-
-	// 1. Connect and request to fixer.io
-	resp, err := http.Get(fixerURI)
-	if err != nil {
-		log.Println("No connection with fixer.io: "+fixerURI+" ...", err.Error())
-		return
-	}
-
-	// 2. Decode payload
-	payload := &(types.FixerIn{})
-	err = json.NewDecoder(resp.Body).Decode(payload)
-	if err != nil {
-		log.Println("Could not decode resp.Body...", err.Error())
-		return
-	}
-
-	// 3. Connect to DB
-	db, err := database.Open()
-	if err != nil {
-		log.Println("Database no connection: ", err.Error())
-	}
-	defer database.Close()
-
-	payload.Timestamp = time.Now().String()
-
-	// 5. Dump payload to database
-	err = db.C(os.Getenv("COLLECTION_FIXER")).Insert(payload)
-	if err != nil {
-		log.Println("Error on db.Insert():\n", err.Error())
-
-	}
-	log.Println("Successfull grab of fixer.io: ", payload)
-
-	// 6. Fire webhooks
-	client := &http.Client{}
-	tool.InvokeWebhooks(client, db.C(os.Getenv("COLLECTION_WEBHOOK")), db.C(os.Getenv("COLLECTION_FIXER")))
 }

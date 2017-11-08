@@ -1,4 +1,4 @@
-package tool
+package invoke
 
 import (
 	"bytes"
@@ -11,8 +11,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// InvokeWebhooks ...
-func InvokeWebhooks(client *http.Client, collectionWebhook *mgo.Collection, collectionFixer *mgo.Collection) {
+// Webhooks ...
+func Webhooks(client *http.Client, collectionWebhook *mgo.Collection, collectionFixer *mgo.Collection) {
 	hooks := []types.Webhook{}
 	collectionWebhook.Find(nil).All(&hooks)
 	for _, hook := range hooks {
