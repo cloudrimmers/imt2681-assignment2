@@ -3,32 +3,14 @@ package tool
 import (
 	"encoding/json"
 	"errors"
-	"flag"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/url"
-	"os"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
-	"github.com/subosito/gotenv"
 )
 
 var currencies []string
-
-func init() {
-	// @doc https://stackoverflow.com/questions/14249217/how-do-i-know-im-running-within-go-test
-	if flag.Lookup("test.v") == nil {
-		gotenv.MustLoad(".env")
-		log.Println("!!! NORMAL RUN !!!")
-		currencies = loadCurrencies(os.Getenv("CURRENCY_PATH"))
-
-	} else {
-		gotenv.MustLoad("../../.env")
-		fmt.Println("!!! TEST RUN !!!")
-		currencies = loadCurrencies("../." + os.Getenv("CURRENCY_PATH"))
-	}
-}
 
 // Load the settings file to configure settings
 func loadCurrencies(filepath string) []string {
@@ -38,7 +20,9 @@ func loadCurrencies(filepath string) []string {
 	log.Println("Loading config from : ", filepath)
 
 	if err != nil {
+		log.Println("Panic upcomming.....")
 		panic(err.Error())
+
 	}
 	var currencies []string
 	if err = json.Unmarshal(data, &currencies); err != nil {

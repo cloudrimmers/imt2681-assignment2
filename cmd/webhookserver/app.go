@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
+
+	"github.com/Arxcis/imt2681-assignment2/lib/invoke"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
 	"github.com/Arxcis/imt2681-assignment2/lib/httperror"
@@ -17,9 +18,11 @@ import (
 
 // App ...
 type App struct {
-	collectionWebhook string
-	collectionFixer   string
-	name              string
+	CollectionWebhook string
+	CollectionFixer   string
+	MongodbName       string
+	MongodbURI        string
+	Mongo             database.Mongo
 }
 
 var err error
@@ -47,12 +50,12 @@ func (app *App) PostWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 3. Open collection
-	cwebhook, err := database.OpenWebhook()
+	cwebhook, err := app.Mongo.OpenC(app.CollectionWebhook)
 	if err != nil {
 		httperror.ServiceUnavailable(w, err)
 		return
 	}
-	defer database.Close()
+	defer app.Mongo.Close()
 
 	// 4. Insert webhook
 	webhook.ID = bson.NewObjectId()
@@ -72,12 +75,12 @@ func (app *App) PostWebhook(w http.ResponseWriter, r *http.Request) {
 func (app *App) GetWebhook(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Open collection
-	cwebhook, err := database.OpenWebhook()
+	cwebhook, err := app.Mongo.OpenC(app.CollectionWebhook)
 	if err != nil {
 		httperror.ServiceUnavailable(w, err)
 		return
 	}
-	defer database.Close()
+	defer app.Mongo.Close()
 
 	// 2. Find webhook
 	queryID := bson.ObjectIdHex(mux.Vars(r)["id"])
@@ -100,12 +103,12 @@ func (app *App) GetWebhook(w http.ResponseWriter, r *http.Request) {
 func (app *App) GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Open collection
-	cwebhook, err := database.OpenWebhook()
+	cwebhook, err := app.Mongo.OpenC(app.CollectionWebhook)
 	if err != nil {
 		httperror.ServiceUnavailable(w, err)
 		return
 	}
-	defer database.Close()
+	defer app.Mongo.Close()
 
 	// 2. Find all webhooks
 	hooks := []types.Webhook{}
@@ -125,12 +128,12 @@ func (app *App) GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 func (app *App) DeleteWebhook(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Open collection
-	cwebhook, err := database.OpenWebhook()
+	cwebhook, err := app.Mongo.OpenC(app.CollectionWebhook)
 	if err != nil {
 		httperror.ServiceUnavailable(w, err)
 		return
 	}
-	defer database.Close()
+	defer app.Mongo.Close()
 
 	// 2. Log and delete
 	queryID := bson.ObjectIdHex(mux.Vars(r)["id"])
@@ -157,12 +160,12 @@ func (app *App) GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 2. Open collection
-	cfixer, err := database.OpenFixer()
+	cfixer, err := app.Mongo.OpenC(app.CollectionFixer)
 	if err != nil {
 		httperror.ServiceUnavailable(w, err)
 		return
 	}
-	defer database.Close()
+	defer app.Mongo.Close()
 
 	// 3. Find latest entry in fixer collection
 	fixer := types.FixerIn{}
@@ -184,12 +187,12 @@ func (app *App) GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(request)
 
 	// 2. Open database
-	cfixer, err := database.OpenFixer()
+	cfixer, err := app.Mongo.OpenC(app.CollectionFixer)
 	if err != nil {
 		httperror.ServiceUnavailable(w, err)
 		return
 	}
-	defer database.Close()
+	defer app.Mongo.Close()
 
 	// 2. Find sorted on date descending
 	var average float64
@@ -216,14 +219,14 @@ func (app *App) GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 func (app *App) EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Open database
-	db, err := database.Open()
+	db, err := app.Mongo.Open()
 	if err != nil {
 		httperror.ServiceUnavailable(w, err)
 		return
 	}
-	defer database.Close()
+	defer app.Mongo.Close()
 
 	// 2. Invoke all webhooks
 	client := &http.Client{}
-	tool.InvokeWebhooks(client, db.C(os.Getenv("COLLECTION_WEBHOOK")), db.C(os.Getenv("COLLECTION_FIXER")))
+	invoke.Webhooks(client, db.C(app.CollectionWebhook), db.C(app.CollectionFixer))
 }

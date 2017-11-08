@@ -12,35 +12,35 @@ var err error
 type Mongo struct {
 	Name    string
 	URI     string
-	session *mgo.Session
+	Session *mgo.Session
 }
 
 // Open ...
 func (mongo *Mongo) Open() (*mgo.Database, error) {
 
-	mongo.session, err = mgo.Dial(mongo.URI)
+	mongo.Session, err = mgo.Dial(mongo.URI)
 	if err != nil {
 		return nil, err
 	}
-	mongo.session.SetMode(mgo.Monotonic, true) // @note not sure what this is, but many people use it
-	return mongo.session.DB(mongo.Name), nil
+	mongo.Session.SetMode(mgo.Monotonic, true) // @note not sure what this is, but many people use it
+	return mongo.Session.DB(mongo.Name), nil
 }
 
 // Close ...
 func (mongo *Mongo) Close() {
-	mongo.session.Close()
+	mongo.Session.Close()
 }
 
 // OpenC - opens a collection
 func (mongo *Mongo) OpenC(cName string) (*mgo.Collection, error) {
 
-	mongo.session, err = mgo.Dial(mongo.URI)
+	mongo.Session, err = mgo.Dial(mongo.URI)
 	if err != nil {
 		return nil, err
 	}
-	mongo.session.SetMode(mgo.Monotonic, true) // @note not sure what this is, but many people use it
+	mongo.Session.SetMode(mgo.Monotonic, true) // @note not sure what this is, but many people use it
 
-	return mongo.session.DB(mongo.Name).C(cName), nil
+	return mongo.Session.DB(mongo.Name).C(cName), nil
 }
 
 // EnsureIndex ...
