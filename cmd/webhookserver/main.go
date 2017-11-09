@@ -21,7 +21,7 @@ func init() {
 	log.Println("Webhookserver booting up...")
 
 	log.Println("Reading .env")
-	gotenv.MustLoad(".env")
+//	gotenv.MustLoad(".env")
 	log.Println("Done with .env")
 
 	configpath := "./config/currency.json"
