@@ -11,7 +11,7 @@ import (
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
 
 	"github.com/gorilla/mux"
-	_"github.com/subosito/gotenv"
+	"github.com/subosito/gotenv"
 )
 
 // APP - global state pbject
@@ -21,15 +21,15 @@ func init() {
 	log.Println("Webhookserver booting up...")
 
 	log.Println("Reading .env")
-//	gotenv.MustLoad(".env")
+	gotenv.MustLoad(".env")
 	log.Println("Done with .env")
 
 	configpath := "./config/currency.json"
 	APP = &app.App{
 		Path:              os.Getenv("API_PATH"),
 		Port:              os.Getenv("PORT"),
-		CollectionWebhook: os.Getenv("COLLECTION_FIXER"),
-		CollectionFixer:   os.Getenv("COLLECTION_WEBHOOK"),
+		CollectionWebhook: os.Getenv("COLLECTION_WEBHOOK"),
+		CollectionFixer:   os.Getenv("COLLECTION_FIXER"),
 		Mongo: database.Mongo{
 			Name:    os.Getenv("MONGODB_NAME"),
 			URI:     os.Getenv("MONGODB_URI"),
