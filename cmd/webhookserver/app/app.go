@@ -63,7 +63,6 @@ func (app *App) PostWebhook(w http.ResponseWriter, r *http.Request) {
 	webhook.ID = bson.NewObjectId()
 	err = cwebhook.Insert(webhook)
 	if err != nil {
-		log.Println("I am st upid!!")
 		httperror.InternalServer(w, "cwebhook.Insert()", err)
 		return
 	}
