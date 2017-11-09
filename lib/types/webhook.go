@@ -23,12 +23,12 @@ var (
 */
 type Webhook struct {
 	ID              bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	WebhookURL      string        `json:"webhookURL"`
-	BaseCurrency    string        `json:"baseCurrency"`
-	TargetCurrency  string        `json:"targetCurrency"`
-	CurrentRate     float64       `json:"currentRate,omitempty" bson:",omitempty"`
-	MinTriggerValue float64       `json:"minTriggerValue"`
-	MaxTriggerValue float64       `json:"maxTriggerValue"`
+	WebhookURL      string        `bson:"webhookURL"`
+	BaseCurrency    string        `bson:"baseCurrency"`
+	TargetCurrency  string        `bson:"targetCurrency"`
+	CurrentRate     float64       `bson:"currentRate,omitempty"`
+	MinTriggerValue float64       `bson:"minTriggerValue"`
+	MaxTriggerValue float64       `bson:"maxTriggerValue"`
 }
 
 // WithinBounds ...

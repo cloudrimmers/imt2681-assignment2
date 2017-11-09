@@ -46,13 +46,13 @@ func (mongo *Mongo) OpenC(cName string) (*mgo.Collection, error) {
 }
 
 // EnsureIndex ...
-func (mongo *Mongo) EnsureIndex(cName string, keys []string) {
+func (mongo *Mongo) EnsureIndex(cName string, keys []string) error {
 	// 1. Open collection
 	log.Println("Ensuring unique " + cName + " index")
 	collection, err := mongo.OpenC(cName)
 	if err != nil {
 		log.Println(err.Error())
-		return
+		return err
 	}
 	defer mongo.Close()
 	log.Println("Success ensuring " + cName + " index")
@@ -64,5 +64,7 @@ func (mongo *Mongo) EnsureIndex(cName string, keys []string) {
 	})
 	if err != nil {
 		log.Println(err.Error())
+		return err
 	}
+	return nil
 }
