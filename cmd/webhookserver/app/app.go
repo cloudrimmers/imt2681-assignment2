@@ -2,7 +2,6 @@ package app
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -87,7 +86,7 @@ func (app *App) GetWebhook(w http.ResponseWriter, r *http.Request) {
 	// 2. Find webhook)
 	rawID := mux.Vars(r)["id"]
 	if rawID == "" {
-		httperror.BadRequest(w, errors.New("Bad ID"))
+		httperror.BadRequest(w, fmt.Errorf("Bad ID"))
 		return
 	}
 	queryID := bson.ObjectIdHex(rawID)
@@ -119,6 +118,7 @@ func (app *App) GetWebhookAll(w http.ResponseWriter, r *http.Request) {
 	// 2. Find all webhooks
 	hooks := []types.Webhook{}
 	err = cwebhook.Find(nil).All(&hooks)
+	//log.Println(hooks)
 	if err != nil {
 		httperror.NotFound(w, err)
 		return
@@ -158,10 +158,27 @@ func (app *App) DeleteWebhook(w http.ResponseWriter, r *http.Request) {
 func (app *App) GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Decode request body
-	reqQuery := &types.CurrencyIn{}
-	err := json.NewDecoder(r.Body).Decode(reqQuery)
+	reqBody := &types.CurrencyIn{}
+
+	err := json.NewDecoder(r.Body).Decode(reqBody)
 	if err != nil {
-		httperror.BadRequest(w, err)
+		httperror.BadRequest(w, fmt.Errorf("Malformed body"))
+		return
+	}
+
+	// 1.5 Validate
+	if validate.Currency(reqBody.BaseCurrency, app.Currency) != nil {
+		httperror.BadRequest(w, fmt.Errorf("Invalid base currency"))
+		return
+	}
+
+	if validate.Currency(reqBody.TargetCurrency, app.Currency) != nil {
+		httperror.BadRequest(w, fmt.Errorf("Invalid target currency"))
+		return
+	}
+
+	if reqBody.BaseCurrency == reqBody.TargetCurrency {
+		httperror.BadRequest(w, fmt.Errorf("Base currency cannot be equal target currency"))
 		return
 	}
 
@@ -175,22 +192,42 @@ func (app *App) GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 
 	// 3. Find latest entry in fixer collection
 	fixer := types.FixerIn{}
-	err = cfixer.Find(bson.M{"base": reqQuery.BaseCurrency}).Sort("-date").One(&fixer)
+	err = cfixer.Find(bson.M{"base": reqBody.BaseCurrency}).Sort("-date").One(&fixer)
 	if err != nil {
 		httperror.NotFound(w, err)
 		return
 	}
 
 	// 4. Respond
-	fmt.Fprintf(w, "%.2f", fixer.Rates[reqQuery.TargetCurrency])
+	fmt.Fprintf(w, "%.2f", fixer.Rates[reqBody.TargetCurrency])
 }
 
 // GetAverageCurrency ...
 func (app *App) GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Decode request body
-	request := &types.CurrencyIn{}
-	_ = json.NewDecoder(r.Body).Decode(request)
+	reqBody := &types.CurrencyIn{}
+	err := json.NewDecoder(r.Body).Decode(reqBody)
+	if err != nil {
+		httperror.BadRequest(w, fmt.Errorf("Malformed body"))
+		return
+	}
+
+	// 1.5 Validate
+	if validate.Currency(reqBody.BaseCurrency, app.Currency) != nil {
+		httperror.BadRequest(w, fmt.Errorf("Invalid base currency"))
+		return
+	}
+
+	if validate.Currency(reqBody.TargetCurrency, app.Currency) != nil {
+		httperror.BadRequest(w, fmt.Errorf("Invalid target currency"))
+		return
+	}
+
+	if reqBody.BaseCurrency == reqBody.TargetCurrency {
+		httperror.BadRequest(w, fmt.Errorf("Base currency cannot be equal target currency"))
+		return
+	}
 
 	// 2. Open database
 	cfixer, err := app.Mongo.OpenC(app.CollectionFixer)
@@ -205,15 +242,19 @@ func (app *App) GetAverageCurrency(w http.ResponseWriter, r *http.Request) {
 	const dayCount int = 3
 	fixerArray := []types.FixerIn{}
 
-	err = cfixer.Find(bson.M{"base": request.BaseCurrency}).Sort("-date").Limit(dayCount).All(&fixerArray)
+	err = cfixer.Find(bson.M{"base": reqBody.BaseCurrency}).Sort("-date").Limit(dayCount).All(&fixerArray)
 	if err != nil {
-		httperror.NotFound(w, err)
+		httperror.InternalServer(w, err)
 		return
 	}
 
+	if len(fixerArray) == 0 {
+		httperror.NotFound(w, fmt.Errorf("No fixers found on base currency"))
+		return
+	}
 	// 3. Average last 3 days
 	for _, fixer := range fixerArray {
-		average += fixer.Rates[request.TargetCurrency]
+		average += fixer.Rates[reqBody.TargetCurrency]
 	}
 	average /= float64(dayCount)
 

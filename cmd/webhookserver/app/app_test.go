@@ -18,6 +18,7 @@ import (
 )
 
 var APP *App
+var testid bson.ObjectId
 
 func init() {
 
@@ -75,8 +76,6 @@ func TestHelloWorld(t *testing.T) {
 	fmt.Printf("%s", greeting)
 }
 
-var testid bson.ObjectId
-
 func TestPostWebhook(t *testing.T) {
 
 	ts := httptest.NewServer(http.HandlerFunc(APP.PostWebhook))
@@ -108,32 +107,124 @@ func TestGetWebhook(t *testing.T) {
 	r.HandleFunc(APP.Path+"/webhook/{id}", APP.GetWebhook).Methods("GET")
 	ts := httptest.NewServer(r)
 	defer ts.Close()
-	ids := map[string]int{
+
+	table := map[string]int{
 		//"":           http.StatusBadRequest,
 		bson.NewObjectId().Hex(): http.StatusNotFound,
 		testid.Hex():             http.StatusOK,
 	}
 
-	for id, status := range ids {
-		url := ts.URL + APP.Path + "/webhook/" + id
-		log.Println("url: ", url)
-		resp, err := http.Get(url)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if s := resp.StatusCode; s != status {
-			t.Fatalf("Wrong status code. Got %d want %d", s, status)
-		} else {
-			data, _ := ioutil.ReadAll(resp.Body)
-			log.Println(string(data))
-		}
+	for id, status := range table {
+		t.Run(id, func(t *testing.T) {
+			url := ts.URL + APP.Path + "/webhook/" + id
+			resp, err := http.Get(url)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if s := resp.StatusCode; s != status {
+				t.Fatalf("Wrong status code. Got %d want %d", s, status)
+			}
+		})
+	}
+}
+func TestGetWebhookAll(t *testing.T) {
+
+	r := mux.NewRouter()
+	r.HandleFunc(APP.Path+"/webhook/", APP.GetWebhookAll).Methods("GET")
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+
+	url := ts.URL + APP.Path + "/webhook/"
+	t.Log("Testing", url)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		t.Fatal(err)
 	}
 
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("Wrong status code. Got %d want %d", resp.StatusCode, http.StatusOK)
+	}
 }
-func TestGetWebhookAll(t *testing.T)      {}
-func TestGetLatestCurrency(t *testing.T)  {}
-func TestGetAverageCurrency(t *testing.T) {}
-func TestEvaluationTrigger(t *testing.T)  {}
+func TestGetLatestCurrency(t *testing.T) {
+
+	// 1. Setup router
+	r := mux.NewRouter()
+	r.HandleFunc(APP.Path+"/currency/latest", APP.GetLatestCurrency).Methods("POST")
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+
+	url := ts.URL + APP.Path + "/currency/latest"
+	t.Log("Testing", url)
+
+	// 2. Define table
+	table := map[types.CurrencyIn]int{
+		//{BaseCurrency: "RAR", TargetCurrency: "NOK"}: http.StatusBadRequest, //@todo - This should be handled as a bad request
+		{BaseCurrency: "EUR", TargetCurrency: "EUR"}: http.StatusBadRequest,
+		{BaseCurrency: "AAA", TargetCurrency: "EUR"}: http.StatusBadRequest,
+		{BaseCurrency: "EUR", TargetCurrency: "AAA"}: http.StatusBadRequest,
+		{BaseCurrency: "USD", TargetCurrency: "EUR"}: http.StatusNotFound,
+		{BaseCurrency: "EUR", TargetCurrency: "NOK"}: http.StatusOK,
+	}
+
+	// 3. Run tests
+	for postBody, wantedStatus := range table {
+		byteBody, _ := json.Marshal(postBody)
+		t.Run(string(byteBody), func(t *testing.T) {
+			resp, err := http.Post(url, "application/json", bytes.NewReader(byteBody))
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if resp.StatusCode != wantedStatus {
+				t.Fatalf("Wrong status code. Got %d want %d", resp.StatusCode, wantedStatus)
+			}
+		})
+	}
+
+	malformedString := "sdjføalsjfløsajdfløjslødj"
+	t.Run("Malformed request: "+malformedString, func(t *testing.T) {
+		resp, _ := http.Post(url, "application/json", ioutil.NopCloser(bytes.NewBufferString(malformedString)))
+		if resp.StatusCode != http.StatusBadRequest {
+			t.Fatalf("Wrong status code. Got %d want %d", http.StatusBadRequest, resp.StatusCode)
+		}
+	})
+}
+func TestGetAverageCurrency(t *testing.T) {
+	// 1. Setup router
+	r := mux.NewRouter()
+	r.HandleFunc(APP.Path+"/currency/average", APP.GetAverageCurrency).Methods("POST")
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+
+	url := ts.URL + APP.Path + "/currency/average"
+	t.Log("Testing", url)
+	// 2. Define table
+	table := map[types.CurrencyIn]int{
+		//{BaseCurrency: "RAR", TargetCurrency: "NOK"}: http.StatusBadRequest, //@todo - This should be handled as a bad request
+		{BaseCurrency: "EUR", TargetCurrency: "EUR"}: http.StatusBadRequest,
+		{BaseCurrency: "AAA", TargetCurrency: "EUR"}: http.StatusBadRequest,
+		{BaseCurrency: "EUR", TargetCurrency: "AAA"}: http.StatusBadRequest,
+		{BaseCurrency: "USD", TargetCurrency: "EUR"}: http.StatusNotFound,
+		{BaseCurrency: "EUR", TargetCurrency: "NOK"}: http.StatusOK,
+	}
+
+	// 3. Run tests
+	for postBody, wantedStatus := range table {
+		byteBody, _ := json.Marshal(postBody)
+		t.Run(string(byteBody), func(t *testing.T) {
+			resp, err := http.Post(url, "application/json", bytes.NewReader(byteBody))
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if resp.StatusCode != wantedStatus {
+				t.Fatalf("Wrong status code. Got %d want %d", resp.StatusCode, wantedStatus)
+			}
+		})
+	}
+}
+func TestEvaluationTrigger(t *testing.T) {}
 
 func reseedDB() error {
 

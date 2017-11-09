@@ -17,7 +17,6 @@ func URI(uri string) error {
 func Currency(currency string, currencyArray []string) error {
 
 	for _, c := range currencyArray {
-
 		if c == currency {
 			return nil
 		}
