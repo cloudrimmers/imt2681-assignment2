@@ -10,7 +10,7 @@ import (
 	"github.com/Arxcis/imt2681-assignment2/cmd/fixerworker/app"
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
-	"github.com/subosito/gotenv"
+	_"github.com/subosito/gotenv"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/tool"
 )

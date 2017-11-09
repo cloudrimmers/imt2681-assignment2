@@ -11,7 +11,7 @@ import (
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
 
 	"github.com/gorilla/mux"
-	"github.com/subosito/gotenv"
+	_"github.com/subosito/gotenv"
 )
 
 // APP - global state pbject
