@@ -34,21 +34,24 @@ func (app *App) HelloWorld(w http.ResponseWriter, r *http.Request) {
 }
 
 // PostWebhook ...
-// POST    /api/v1/subscription/   create a subscription
+// POST    apipath/webhook/   create a subscription
 func (app *App) PostWebhook(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Decode webook
-	webhook := &types.Webhook{}
-	if err = json.NewDecoder(r.Body).Decode(webhook); err != nil {
-		httperror.InternalServer(w, err)
+	webhook := types.Webhook{}
+	err = json.NewDecoder(r.Body).Decode(&webhook)
+	if err != nil {
+		httperror.InternalServer(w, "Failed to decode r.body", err)
 		return
 	}
+	fmt.Println("I am stupid!!")
 
 	// 2. Validate webhook
-	if err = validate.Webhook(webhook, app.Currency); err != nil {
+	if err = validate.Webhook(&webhook, app.Currency); err != nil {
 		httperror.BadRequest(w, err)
 		return
 	}
+	fmt.Println("I am stupid!!")
 
 	// 3. Open collection
 	cwebhook, err := app.Mongo.OpenC(app.CollectionWebhook)
@@ -57,11 +60,13 @@ func (app *App) PostWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer app.Mongo.Close()
+	log.Println("I am stupid!!")
 
 	// 4. Insert webhook
 	webhook.ID = bson.NewObjectId()
-	cwebhook.Insert(webhook)
+	err = cwebhook.Insert(webhook)
 	if err != nil {
+		log.Println("I am st upid!!")
 		httperror.InternalServer(w, err)
 		return
 	}

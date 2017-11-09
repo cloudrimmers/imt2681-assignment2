@@ -60,11 +60,11 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/", APP.HelloWorld).Methods("GET")
-	router.HandleFunc(APP.Path+"/webhook", APP.PostWebhook).Methods("POST")
-	router.HandleFunc(APP.Path+"/webhook", APP.GetWebhookAll).Methods("GET")
+	router.HandleFunc(APP.Path+"/webhook/", APP.PostWebhook).Methods("POST")
+	router.HandleFunc(APP.Path+"/webhook/", APP.GetWebhookAll).Methods("GET")
 	router.HandleFunc(APP.Path+"/webhook/{id}", APP.GetWebhook).Methods("GET")
 	router.HandleFunc(APP.Path+"/webhook/{id}", APP.DeleteWebhook).Methods("DELETE")
-	router.HandleFunc(APP.Path+"/webhook/evaluationtrigger", APP.EvaluationTrigger).Methods("POST")
+	router.HandleFunc(APP.Path+"/trigger/evaluation", APP.EvaluationTrigger).Methods("GET")
 
 	router.HandleFunc(APP.Path+"/currency/latest", APP.GetLatestCurrency).Methods("POST")
 	router.HandleFunc(APP.Path+"/currency/average", APP.GetAverageCurrency).Methods("POST")

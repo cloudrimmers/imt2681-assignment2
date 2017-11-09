@@ -6,25 +6,25 @@ import (
 )
 
 // ServiceUnavailable ...
-func ServiceUnavailable(w http.ResponseWriter, err error) {
-	log.Println("No database connection: ", err.Error())
+func ServiceUnavailable(w http.ResponseWriter, msg string, err error) {
+	log.Println("HTTPERROR  service unavailable | ", msg, " | ", err.Error())
 	http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
 }
 
 // InternalServer ...
-func InternalServer(w http.ResponseWriter, err error) {
-	log.Println("Collection.Insert() error", err.Error())
+func InternalServer(w http.ResponseWriter, msg string, err error) {
+	log.Println("HTTPERROR internal server | ", msg, " | ", err.Error())
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
 
 // NotFound ...
-func NotFound(w http.ResponseWriter, err error) {
-	log.Println("Collection.Find() not found", err.Error())
+func NotFound(w http.ResponseWriter, msg string, err error) {
+	log.Println("HTTPERROR not found | ", msg, " | ", err.Error())
 	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 }
 
 // BadRequest ...
-func BadRequest(w http.ResponseWriter, err error) {
-	log.Println("Http bad request", err.Error())
+func BadRequest(w http.ResponseWriter, msg string, err error) {
+	log.Println("HTTPERROR bad request | ", msg, " | ", err.Error())
 	http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 }
