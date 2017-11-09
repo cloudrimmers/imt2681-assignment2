@@ -22,6 +22,12 @@
 			"revisionTime": "2017-10-20T03:47:00Z"
 		},
 		{
+			"checksumSHA1": "TroUrCnO7mVi4ZB+I5t4gXJZdE0=",
+			"path": "github.com/subosito/gotenv",
+			"revision": "009e1f9581dc712aba5682a279dee155ca3eeded",
+			"revisionTime": "2017-01-20T14:09:13Z"
+		},
+		{
 			"checksumSHA1": "1D8GzeoFGUs5FZOoyC2DpQg8c5Y=",
 			"path": "gopkg.in/mgo.v2",
 			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
