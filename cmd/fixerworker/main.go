@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/Arxcis/imt2681-assignment2/cmd/fixerworker/app"
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
 	"github.com/subosito/gotenv"
@@ -15,7 +16,7 @@ import (
 )
 
 // APP - global state pbject
-var APP *App
+var APP *app.App
 var err error
 
 func init() {
@@ -26,7 +27,7 @@ func init() {
 	log.Println("Done with .env")
 
 	configpath := "./config/seedfixer.json"
-	APP = &App{
+	APP = &app.App{
 		FixerioURI:        os.Getenv("FIXERIO_URI"),
 		CollectionWebhook: os.Getenv("COLLECTION_WEBHOOK"),
 		CollectionFixer:   os.Getenv("COLLECTION_FIXER"),

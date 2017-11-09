@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Arxcis/imt2681-assignment2/cmd/webhookserver/app"
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
 
 	"github.com/gorilla/mux"
@@ -14,7 +15,7 @@ import (
 )
 
 // APP - global state pbject
-var APP *App
+var APP *app.App
 
 func init() {
 	log.Println("Webhookserver booting up...")
@@ -24,7 +25,7 @@ func init() {
 	log.Println("Done with .env")
 
 	configpath := "./config/currency.json"
-	APP = &App{
+	APP = &app.App{
 		Path:              os.Getenv("API_PATH"),
 		Port:              os.Getenv("PORT"),
 		CollectionWebhook: os.Getenv("COLLECTION_FIXER"),

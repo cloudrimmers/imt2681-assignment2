@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"encoding/json"
@@ -26,7 +26,7 @@ func (app *App) Fixer2Mongo() {
 	// 1. Connect and request to fixer.io
 	resp, err := http.Get(app.FixerioURI)
 	if err != nil {
-		log.Println("ERROR No connection with fixer.io: "+APP.FixerioURI+" ...", err.Error())
+		log.Println("ERROR No connection with fixer.io: "+app.FixerioURI+" ...", err.Error())
 		return
 	}
 
@@ -49,7 +49,7 @@ func (app *App) Fixer2Mongo() {
 	payload.Timestamp = time.Now().String()
 
 	// 5. Dump payload to database
-	err = dbsession.C(APP.CollectionFixer).Insert(payload)
+	err = dbsession.C(app.CollectionFixer).Insert(payload)
 	if err != nil {
 		log.Println("ERROR on db.Insert():\n", err.Error())
 		return
@@ -58,7 +58,7 @@ func (app *App) Fixer2Mongo() {
 
 	// 6. Fire webhooks
 	client := &http.Client{}
-	invoke.Webhooks(client, dbsession.C(APP.CollectionWebhook), dbsession.C(APP.CollectionFixer))
+	invoke.Webhooks(client, dbsession.C(app.CollectionWebhook), dbsession.C(app.CollectionFixer))
 }
 
 // SeedFixer ...

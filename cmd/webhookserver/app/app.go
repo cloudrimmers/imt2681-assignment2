@@ -1,7 +1,8 @@
-package main
+package app
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -83,8 +84,13 @@ func (app *App) GetWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 	defer app.Mongo.Close()
 
-	// 2. Find webhook
-	queryID := bson.ObjectIdHex(mux.Vars(r)["id"])
+	// 2. Find webhook)
+	rawID := mux.Vars(r)["id"]
+	if rawID == "" {
+		httperror.BadRequest(w, errors.New("Bad ID"))
+		return
+	}
+	queryID := bson.ObjectIdHex(rawID)
 	hook := &types.Webhook{}
 
 	err = cwebhook.FindId(queryID).One(hook)
@@ -97,7 +103,6 @@ func (app *App) GetWebhook(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("content-type", "application/json")
 	data, _ := json.Marshal(hook)
 	w.Write(data)
-
 }
 
 // GetWebhookAll ...

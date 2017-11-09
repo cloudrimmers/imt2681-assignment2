@@ -1,3 +1,5 @@
+## 09.11.17
+- table driven tests ++ https://github.com/gorilla/mux/issues/167
 
 ## 01.11.17
 - Testing http handlers go - https://elithrar.github.io/article/testing-http-handlers-go/

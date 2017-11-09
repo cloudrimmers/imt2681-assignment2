@@ -18,7 +18,6 @@ func TestWebhooks(t *testing.T) {
 		fmt.Fprintln(w, "!!! Invoked! !!!")
 	}))
 	defer ts.Close()
-
 	db, err := mongo.Open()
 	if err != nil {
 		t.Error(err.Error())
@@ -53,13 +52,6 @@ func TestWebhooks(t *testing.T) {
 		"minTriggerValue": 9.0,
 		"maxTriggerValue": 9.9,
 	})
-	mongo.Close()
-	db, err = mongo.Open()
-	if err != nil {
-		t.Error(err.Error())
-	}
-	cWebhook = db.C("testhook")
-	cFixer = db.C("testfixer")
 
 	client := http.Client{}
 	Webhooks(&client, cWebhook, cFixer)
