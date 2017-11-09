@@ -17,7 +17,7 @@ import (
 var APP *App
 
 func init() {
-	log.Println("Webhookserver starting up...")
+	log.Println("Webhookserver booting up...")
 
 	log.Println("Reading .env")
 	gotenv.MustLoad(".env")
@@ -25,6 +25,8 @@ func init() {
 
 	configpath := "./config/currency.json"
 	APP = &App{
+		Path:              os.Getenv("API_PATH"),
+		Port:              os.Getenv("PORT"),
 		CollectionWebhook: os.Getenv("COLLECTION_FIXER"),
 		CollectionFixer:   os.Getenv("COLLECTION_WEBHOOK"),
 		Mongo: database.Mongo{
@@ -46,27 +48,26 @@ func init() {
 			return currency
 		}(),
 	}
-	indented, _ := json.MarshalIndent(APP, "", "    ")
-	log.Println(string(indented))
+	// @verbose
+	// indented, _ := json.MarshalIndent(APP, "", "    ")
+	// log.Println(string(indented))
 	log.Println("Webhookserver initialized...")
 }
 
 func main() {
 
-	var port = os.Getenv("PORT")
-	var apiBase = os.Getenv("API_VERSION_PATH")
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/", APP.HelloWorld).Methods("GET")
-	router.HandleFunc(apiBase+"/webhook", APP.PostWebhook).Methods("POST")
-	router.HandleFunc(apiBase+"/webhook", APP.GetWebhookAll).Methods("GET")
-	router.HandleFunc(apiBase+"/webhook/{id}", APP.GetWebhook).Methods("GET")
-	router.HandleFunc(apiBase+"/webhook/{id}", APP.DeleteWebhook).Methods("DELETE")
-	router.HandleFunc(apiBase+"/webhook/evaluationtrigger", APP.EvaluationTrigger).Methods("POST")
+	router.HandleFunc(APP.Path+"/webhook", APP.PostWebhook).Methods("POST")
+	router.HandleFunc(APP.Path+"/webhook", APP.GetWebhookAll).Methods("GET")
+	router.HandleFunc(APP.Path+"/webhook/{id}", APP.GetWebhook).Methods("GET")
+	router.HandleFunc(APP.Path+"/webhook/{id}", APP.DeleteWebhook).Methods("DELETE")
+	router.HandleFunc(APP.Path+"/webhook/evaluationtrigger", APP.EvaluationTrigger).Methods("POST")
 
-	router.HandleFunc(apiBase+"/currency/latest", APP.GetLatestCurrency).Methods("POST")
-	router.HandleFunc(apiBase+"/currency/average", APP.GetAverageCurrency).Methods("POST")
+	router.HandleFunc(APP.Path+"/currency/latest", APP.GetLatestCurrency).Methods("POST")
+	router.HandleFunc(APP.Path+"/currency/average", APP.GetAverageCurrency).Methods("POST")
 
-	log.Println("port: ", port, "apiBase: ", apiBase)
-	log.Println(http.ListenAndServe(":"+port, router))
+	log.Println("port: ", APP.Port, "app.Path: ", APP.Path)
+	log.Println(http.ListenAndServe(":"+APP.Port, router))
 }

@@ -52,6 +52,7 @@ func init() {
 	//APP.SeedFixer() // @note enable/disable
 	APP.Mongo.EnsureIndex(APP.CollectionFixer, []string{"date"})
 
+	//@verbose
 	//	indented, _ := json.MarshalIndent(APP, "", "    ")
 	//	log.Println(string(indented))
 	log.Println("Fixerworker initialized...")

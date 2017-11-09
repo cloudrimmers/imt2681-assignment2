@@ -18,6 +18,8 @@ import (
 
 // App ...
 type App struct {
+	Path              string
+	Port              string
 	CollectionWebhook string
 	CollectionFixer   string
 	Mongo             database.Mongo
