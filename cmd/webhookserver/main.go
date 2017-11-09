@@ -11,7 +11,6 @@ import (
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
 
 	"github.com/gorilla/mux"
-	"github.com/subosito/gotenv"
 )
 
 // APP - global state pbject
@@ -20,9 +19,9 @@ var APP *app.App
 func init() {
 	log.Println("Webhookserver booting up...")
 
-	log.Println("Reading .env")
-	gotenv.MustLoad(".env")
-	log.Println("Done with .env")
+	//log.Println("Reading .env")
+	//gotenv.MustLoad(".env")
+	//log.Println("Done with .env")
 
 	configpath := "./config/currency.json"
 	APP = &app.App{

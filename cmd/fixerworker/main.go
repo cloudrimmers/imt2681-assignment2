@@ -10,7 +10,6 @@ import (
 	"github.com/Arxcis/imt2681-assignment2/cmd/fixerworker/app"
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
-	"github.com/subosito/gotenv"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/tool"
 )
@@ -22,9 +21,9 @@ var err error
 func init() {
 	log.Println("Fixerworker booting up...")
 
-	log.Println("Reading .env")
-	gotenv.MustLoad(".env")
-	log.Println("Done with .env")
+	//log.Println("Reading .env")
+	//gotenv.MustLoad(".env")
+	//log.Println("Done with .env")
 
 	configpath := "./config/seedfixer.json"
 	APP = &app.App{
