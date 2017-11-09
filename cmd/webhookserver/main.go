@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -15,16 +17,38 @@ import (
 var APP *App
 
 func init() {
+	log.Println("Webhookserver starting up...")
+
+	log.Println("Reading .env")
 	gotenv.MustLoad(".env")
+	log.Println("Done with .env")
+
+	configpath := "./config/currency.json"
 	APP = &App{
 		CollectionWebhook: os.Getenv("COLLECTION_FIXER"),
 		CollectionFixer:   os.Getenv("COLLECTION_WEBHOOK"),
-		MongodbName:       os.Getenv("MONGODB_NAME"),
-		MongodbURI:        os.Getenv("MONGODB_URI"),
-		Mongo:             database.Mongo{Name: APP.MongodbName, URI: APP.MongodbURI, Session: nil},
+		Mongo: database.Mongo{
+			Name:    os.Getenv("MONGODB_NAME"),
+			URI:     os.Getenv("MONGODB_URI"),
+			Session: nil,
+		},
+		Currency: func() []string {
+			log.Println("Reading " + configpath)
+			data, err := ioutil.ReadFile(configpath)
+			if err != nil {
+				panic(err.Error())
+			}
+			var currency []string
+			if err = json.Unmarshal(data, &currency); err != nil {
+				panic(err.Error())
+			}
+			log.Println("Done with " + configpath)
+			return currency
+		}(),
 	}
-
-	log.Println("Initialized server...")
+	indented, _ := json.MarshalIndent(APP, "", "    ")
+	log.Println(string(indented))
+	log.Println("Webhookserver initialized...")
 }
 
 func main() {

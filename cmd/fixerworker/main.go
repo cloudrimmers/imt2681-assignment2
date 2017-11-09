@@ -1,11 +1,14 @@
 package main
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
+	"github.com/Arxcis/imt2681-assignment2/lib/types"
 	"github.com/subosito/gotenv"
 
 	"github.com/Arxcis/imt2681-assignment2/lib/tool"
@@ -16,21 +19,42 @@ var APP *App
 var err error
 
 func init() {
-	gotenv.MustLoad(".env")
+	log.Println("Fixerworker booting up...")
 
+	log.Println("Reading .env")
+	gotenv.MustLoad(".env")
+	log.Println("Done with .env")
+
+	configpath := "./config/seedfixer.json"
 	APP = &App{
 		FixerioURI:        os.Getenv("FIXERIO_URI"),
-		SeedFixerPath:     "./config/seedfixer.json",
-		CollectionWebhook: os.Getenv("COLLECTION_FIXER"),
-		CollectionFixer:   os.Getenv("COLLECTION_WEBHOOK"),
-		MongodbName:       os.Getenv("MONGODB_NAME"),
-		MongodbURI:        os.Getenv("MONGODB_URI"),
-		Mongo:             database.Mongo{Name: APP.MongodbName, URI: APP.MongodbURI, Session: nil},
+		CollectionWebhook: os.Getenv("COLLECTION_WEBHOOK"),
+		CollectionFixer:   os.Getenv("COLLECTION_FIXER"),
+		Mongo: database.Mongo{
+			Name:    os.Getenv("MONGODB_NAME"),
+			URI:     os.Getenv("MONGODB_URI"),
+			Session: nil,
+		},
+		Seed: func() []types.FixerIn {
+			log.Println("Reading " + configpath)
+			data, err := ioutil.ReadFile(configpath)
+			if err != nil {
+				panic(err.Error())
+			}
+			var fixerin []types.FixerIn
+			if err = json.Unmarshal(data, &fixerin); err != nil {
+				panic(err.Error())
+			}
+			log.Println("Done with " + configpath)
+			return fixerin
+		}(),
 	}
-	APP.SeedFixer() // @note enable/disable
+	//APP.SeedFixer() // @note enable/disable
 	APP.Mongo.EnsureIndex(APP.CollectionFixer, []string{"date"})
 
-	log.Println("Fixer app initialized...")
+	//	indented, _ := json.MarshalIndent(APP, "", "    ")
+	//	log.Println(string(indented))
+	log.Println("Fixerworker initialized...")
 }
 
 func main() {

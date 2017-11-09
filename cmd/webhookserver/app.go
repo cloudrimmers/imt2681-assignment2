@@ -10,8 +10,8 @@ import (
 
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
 	"github.com/Arxcis/imt2681-assignment2/lib/httperror"
-	"github.com/Arxcis/imt2681-assignment2/lib/tool"
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
+	"github.com/Arxcis/imt2681-assignment2/lib/validate"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -20,9 +20,8 @@ import (
 type App struct {
 	CollectionWebhook string
 	CollectionFixer   string
-	MongodbName       string
-	MongodbURI        string
 	Mongo             database.Mongo
+	Currency          []string
 }
 
 var err error
@@ -44,7 +43,7 @@ func (app *App) PostWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 2. Validate webhook
-	if err = tool.ValidateWebhook(webhook); err != nil {
+	if err = validate.Webhook(webhook, app.Currency); err != nil {
 		httperror.BadRequest(w, err)
 		return
 	}

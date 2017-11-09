@@ -22,6 +22,7 @@ func (mongo *Mongo) Open() (*mgo.Database, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Println("Database connection established...")
 	mongo.Session.SetMode(mgo.Monotonic, true) // @note not sure what this is, but many people use it
 	return mongo.Session.DB(mongo.Name), nil
 }
@@ -38,6 +39,7 @@ func (mongo *Mongo) OpenC(cName string) (*mgo.Collection, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Println("Database connection established")
 	mongo.Session.SetMode(mgo.Monotonic, true) // @note not sure what this is, but many people use it
 
 	return mongo.Session.DB(mongo.Name).C(cName), nil
@@ -46,13 +48,14 @@ func (mongo *Mongo) OpenC(cName string) (*mgo.Collection, error) {
 // EnsureIndex ...
 func (mongo *Mongo) EnsureIndex(cName string, keys []string) {
 	// 1. Open collection
-	log.Println("Ensuring unique fixer index...")
+	log.Println("Ensuring unique " + cName + " index")
 	collection, err := mongo.OpenC(cName)
 	if err != nil {
 		log.Println(err.Error())
 		return
 	}
 	defer mongo.Close()
+	log.Println("Success ensuring " + cName + " index")
 	// 2. Add index
 	err = collection.EnsureIndex(mgo.Index{
 		Key:      keys,
