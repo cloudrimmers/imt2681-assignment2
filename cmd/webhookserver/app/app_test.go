@@ -109,9 +109,9 @@ func TestGetWebhook(t *testing.T) {
 	defer ts.Close()
 
 	table := map[string]int{
-		//"":           http.StatusBadRequest,
-		bson.NewObjectId().Hex(): http.StatusNotFound,
-		testid.Hex():             http.StatusOK,
+		"dfdfdfd":                  http.StatusBadRequest,
+		"45cbc4a0e4123f6920000002": http.StatusNotFound,
+		testid.Hex():               http.StatusOK,
 	}
 
 	for id, status := range table {

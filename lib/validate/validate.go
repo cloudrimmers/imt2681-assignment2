@@ -32,8 +32,8 @@ func TriggerValue(min float64, max float64) error {
 	return errors.New("trigger out of bounds")
 }
 
-// Webhook ...
-func Webhook(hook *types.Webhook, currency []string) error {
+// NewWebhook ...
+func NewWebhook(hook *types.Webhook, currency []string) error {
 
 	var err error
 	if err = URI(hook.WebhookURL); err != nil {

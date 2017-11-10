@@ -46,7 +46,7 @@ func (app *App) PostWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 2. Validate webhook
-	if err = validate.Webhook(&webhook, app.Currency); err != nil {
+	if err = validate.NewWebhook(&webhook, app.Currency); err != nil {
 		httperror.BadRequest(w, "validate.Webhook()", err)
 		return
 	}
@@ -86,8 +86,8 @@ func (app *App) GetWebhook(w http.ResponseWriter, r *http.Request) {
 
 	// 2. Find webhook)
 	rawID := mux.Vars(r)["id"]
-	if rawID == "" {
-		httperror.BadRequest(w, "mux.Vars()[]", fmt.Errorf("Bad ID"))
+	if !bson.IsObjectIdHex(rawID) || rawID == "" {
+		httperror.BadRequest(w, "bson.IsObjectIdHex()", fmt.Errorf("Bad objectID %s", rawID))
 		return
 	}
 	queryID := bson.ObjectIdHex(rawID)
