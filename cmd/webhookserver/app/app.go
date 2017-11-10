@@ -97,7 +97,7 @@ func (app *App) GetWebhook(w http.ResponseWriter, r *http.Request) {
 	// @HACK - MAD HACK JUST TO COMPLY WITH THE ASSIGNMENT 2 routing shecma
 	//   - Redirecting to the /evaluationtrigger - handler
 	if rawID == "evaluationtrigger" {
-		App.EvaluationTrigger(w, r)
+		app.EvaluationTrigger(w, r)
 		return
 	}
 	// @HACK END
