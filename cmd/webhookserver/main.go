@@ -64,7 +64,7 @@ func main() {
 	router := mux.NewRouter().StrictSlash(false)
 
 	router.HandleFunc("/", APP.HelloWorld).Methods("GET")
-	router.HandleFunc(APP.Path+"/", APP.PostWebhook).Methods("POST")
+	router.HandleFunc(APP.Path+"", APP.PostWebhook).Methods("POST")
 	router.HandleFunc(APP.Path+"/", APP.GetWebhookAll).Methods("GET")
 	router.HandleFunc(APP.Path+"/{id}", APP.GetWebhook).Methods("GET")
 	router.HandleFunc(APP.Path+"/{id}", APP.DeleteWebhook).Methods("DELETE")
