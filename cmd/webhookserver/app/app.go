@@ -94,6 +94,13 @@ func (app *App) GetWebhook(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("!!!! GETTTING ID  ", rawID)
 
+	// @HACK - MAD HACK JUST TO COMPLY WITH THE ASSIGNMENT 2 routing shecma
+	//   - Redirecting to the /evaluationtrigger - handler
+	if rawID == "evaluationtrigger" {
+		App.EvaluationTrigger(w, r)
+		return
+	}
+	// @HACK END
 
 	if !bson.IsObjectIdHex(rawID) || rawID == "" {
 		httperror.BadRequest(w, "bson.IsObjectIdHex()", fmt.Errorf("Bad objectID %s", rawID))

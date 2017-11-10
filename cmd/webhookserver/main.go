@@ -68,7 +68,7 @@ func main() {
 	router.HandleFunc(APP.Path+"/", APP.GetWebhookAll).Methods("GET")
 	router.HandleFunc(APP.Path+"/{id}", APP.GetWebhook).Methods("GET")
 	router.HandleFunc(APP.Path+"/{id}", APP.DeleteWebhook).Methods("DELETE")
-	router.HandleFunc(APP.Path+"/trigger/evaluation", APP.EvaluationTrigger).Methods("GET")
+	// router.HandleFunc(APP.Path+"/trigger/evaluation", APP.EvaluationTrigger).Methods("GET")
 
 	router.HandleFunc(APP.Path+"/currency/latest", APP.GetLatestCurrency).Methods("POST")
 	router.HandleFunc(APP.Path+"/currency/average", APP.GetAverageCurrency).Methods("POST")
