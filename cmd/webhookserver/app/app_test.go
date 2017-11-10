@@ -4,17 +4,17 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 	"os"
-	"github.com/gorilla/mux"
+	"testing"
 
-	"github.com/subosito/gotenv"
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
+	"github.com/subosito/gotenv"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -27,7 +27,7 @@ func init() {
 
 	log.Println("Reading ", envpath)
 	gotenv.MustLoad(envpath)
-	log.Println("Done with ",envpath)
+	log.Println("Done with ", envpath)
 
 	APP = &App{
 		Path:              "/api/test",

@@ -2,11 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/subosito/gotenv"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"github.com/subosito/gotenv"
 
 	"github.com/Arxcis/imt2681-assignment2/cmd/webhookserver/app"
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
@@ -19,7 +19,6 @@ var APP *app.App
 
 func init() {
 	log.Println("Webhookserver booting up...")
-
 
 	// Coment out when running on HEROKU cloud
 	if os.Getenv("IS_HEROKU") == "" {
