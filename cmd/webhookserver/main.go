@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/Arxcis/imt2681-assignment2/cmd/webhookserver/app"
+
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
 
 	"github.com/gorilla/mux"
