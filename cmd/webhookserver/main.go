@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"github.com/subosito/gotenv"
 
 	"github.com/Arxcis/imt2681-assignment2/cmd/webhookserver/app"
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
@@ -19,11 +20,15 @@ var APP *app.App
 func init() {
 	log.Println("Webhookserver booting up...")
 
-	//log.Println("Reading .env")
-	//gotenv.MustLoad(".env")
-	//log.Println("Done with .env")
 
-	configpath := "./config/currency.json"
+	// Coment out when running on HEROKU cloud
+	if os.Getenv("IS_HEROKU") == "" {
+		log.Println("Reading .env")
+		gotenv.MustLoad(".env")
+		log.Println("Done with .env")
+	}
+
+	const configpath = "./config/currency.json"
 	APP = &app.App{
 		Path:              os.Getenv("API_PATH"),
 		Port:              os.Getenv("PORT"),

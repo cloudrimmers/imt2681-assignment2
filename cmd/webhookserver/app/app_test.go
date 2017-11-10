@@ -9,9 +9,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
+	"os"
 	"github.com/gorilla/mux"
 
+	"github.com/subosito/gotenv"
 	"github.com/Arxcis/imt2681-assignment2/lib/database"
 	"github.com/Arxcis/imt2681-assignment2/lib/types"
 	"gopkg.in/mgo.v2/bson"
@@ -21,16 +22,21 @@ var APP *App
 var testid bson.ObjectId
 
 func init() {
+	const envpath = "../../../.env"
+	const configpath = "../../../config/currency.json"
 
-	configpath := "../../../config/currency.json"
+	log.Println("Reading ", envpath)
+	gotenv.MustLoad(envpath)
+	log.Println("Done with ",envpath)
+
 	APP = &App{
 		Path:              "/api/test",
 		Port:              "5555",
 		CollectionWebhook: "testhook",
 		CollectionFixer:   "testfixer",
 		Mongo: database.Mongo{
-			Name:    "test",
-			URI:     "127.0.0.1:33017",
+			Name:    os.Getenv("MONGODB_NAME"),
+			URI:     os.Getenv("MONGODB_URI"),
 			Session: nil,
 		},
 		Currency: func() []string {
