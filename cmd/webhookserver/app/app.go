@@ -42,9 +42,8 @@ func (app *App) PostWebhook(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewDecoder(r.Body).Decode(&webhook)
 
-	
 	if err != nil {
-		httperror.InternalServer(w, "json.NewDecoder.Decode() ", err)
+		httperror.BadRequest(w, "json.NewDecoder.Decode() ", err)
 		return
 	}
 
@@ -157,9 +156,15 @@ func (app *App) DeleteWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 	defer app.Mongo.Close()
 
-	// 2. Log and delete
-	queryID := bson.ObjectIdHex(mux.Vars(r)["id"])
+	// 1.5 Parse id
+	rawID := mux.Vars(r)["id"]
+	if !bson.IsObjectIdHex(rawID) || rawID == "" {
+		httperror.BadRequest(w, "bson.IsObjectIdHex()", fmt.Errorf("Bad objectID %s", rawID))
+		return
+	}
+	queryID := bson.ObjectIdHex(rawID)
 
+	// 2. Log and delete
 	err = cwebhook.RemoveId(queryID)
 	if err != nil {
 		httperror.NotFound(w, "cwebhook.RemoveID()", err)
