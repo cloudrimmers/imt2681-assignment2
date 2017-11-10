@@ -39,7 +39,10 @@ func (app *App) PostWebhook(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Decode webook
 	webhook := types.Webhook{}
+
 	err = json.NewDecoder(r.Body).Decode(&webhook)
+
+	
 	if err != nil {
 		httperror.InternalServer(w, "json.NewDecoder.Decode() ", err)
 		return
