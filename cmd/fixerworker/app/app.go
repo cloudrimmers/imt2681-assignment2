@@ -59,8 +59,8 @@ func (app *App) Fixer2Mongo() {
 	log.Println("SUCCESS pulling fixer.io: ", payload)
 }
 
-// SeedFixer ...
-func (app *App) SeedFixer() {
+// SeedFixerdata ...
+func (app *App) SeedFixerdata() {
 
 	// 0. Get seed
 	seed := func() []types.FixerIn {

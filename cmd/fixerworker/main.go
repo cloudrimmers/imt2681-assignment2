@@ -10,7 +10,7 @@ import (
 	"github.com/cloudrimmers/imt2681-assignment3/lib/database"
 	"github.com/subosito/gotenv"
 
-	"github.com/cloudrimmers/imt2681-assignment3/lib/tool"
+	"github.com/cloudrimmers/imt2681-assignment3/lib/timetool"
 )
 
 // READENV read environment from .env file
@@ -50,7 +50,7 @@ func init() {
 	APP.Mongo.EnsureIndex(APP.CollectionFixerName, []string{"date"})
 
 	if SEED {
-		APP.SeedFixer()
+		APP.SeedFixerdata()
 	}
 	if VERBOSE {
 		indented, _ := json.MarshalIndent(APP, "", "    ")
@@ -62,7 +62,7 @@ func init() {
 
 func main() {
 	// @doc https://stackoverflow.com/a/35009735
-	targetWait := -tool.UntilTomorrow()
+	targetWait := -(timetool.UntilTomorrow())
 	ticker := time.NewTicker(time.Minute)
 
 	log.Println("T wait  : ", targetWait.String())
