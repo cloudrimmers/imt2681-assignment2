@@ -1,10 +1,8 @@
 package validate
 
 import (
-	"errors"
+	"fmt"
 	"net/url"
-
-	"github.com/Arxcis/imt2681-assignment2/lib/types"
 )
 
 // URI ...
@@ -21,32 +19,5 @@ func Currency(currency string, currencyArray []string) error {
 			return nil
 		}
 	}
-	return errors.New("currency not supported")
-}
-
-// TriggerValue ...
-func TriggerValue(min float64, max float64) error {
-	if min < max && min >= 0.0 && max > 0.0 {
-		return nil
-	}
-	return errors.New("trigger out of bounds")
-}
-
-// NewWebhook ...
-func NewWebhook(hook *types.Webhook, currency []string) error {
-
-	var err error
-	if err = URI(hook.WebhookURL); err != nil {
-		return err
-	}
-
-	if err = Currency(hook.BaseCurrency, currency); err != nil {
-		return err
-	}
-
-	if err = Currency(hook.TargetCurrency, currency); err != nil {
-		return err
-	}
-
-	return TriggerValue(hook.MinTriggerValue, hook.MaxTriggerValue)
+	return fmt.Errorf("currency not supported")
 }
