@@ -71,7 +71,8 @@ func main() {
 		log.Println("T wait  : ", targetWait.String())
 
 		if targetWait >= 0 {
-			targetWait = -tool.UntilTomorrow()
+			targetWait = -(timetool.UntilTomorrow())
+
 			APP.Fixer2Mongo()
 		}
 	}
