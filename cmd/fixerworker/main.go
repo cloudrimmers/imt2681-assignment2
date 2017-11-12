@@ -14,13 +14,13 @@ import (
 )
 
 // READENV read environment from .env file
-const READENV = false
+const READENV = true
 
 // SEED the database with testdata
 const SEED = false
 
 // VERBOSE log more to console
-const VERBOSE = false
+const VERBOSE = true
 
 // APP - configuration data
 var APP *app.App
@@ -29,13 +29,14 @@ var err error
 func init() {
 	log.Println("Fixerworker booting up...")
 
+	// 1. Require .env to be present
 	if READENV {
 		log.Println("Reading .env")
 		gotenv.MustLoad(".env")
 		log.Println("Done with .env")
 	}
 
-	// Initialize the app object
+	// 2. Initialize the app object
 	APP = &app.App{
 		FixerioURI:          "https://api.fixer.io/latest",
 		CollectionFixerName: "fixer",
@@ -47,8 +48,16 @@ func init() {
 		Seedpath: "./config/fixer.json",
 	}
 
+	// 3. Default values if empty environment
+	if APP.Mongo.URI == "" {
+		APP.Mongo.URI = "mongodb://localhost"
+		APP.Mongo.Name = "test"
+	}
+
+	// 4. Ensure index to avoid duplicates
 	APP.Mongo.EnsureIndex(APP.CollectionFixerName, []string{"date"})
 
+	// 5. Optional seed and log app object
 	if SEED {
 		APP.SeedFixerdata()
 	}
