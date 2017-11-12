@@ -14,6 +14,7 @@ import (
 )
 
 // READENV read environment from .env file
+// @note These 3 bools should probably be command-line arguments - Jonas 13.11.17
 const READENV = true
 
 // SEED the database with testdata
@@ -50,6 +51,7 @@ func init() {
 
 	// 3. Default values if empty environment
 	if APP.Mongo.URI == "" {
+		log.Println("No .env present. Using default values")
 		APP.Mongo.URI = "mongodb://localhost"
 		APP.Mongo.Name = "test"
 	}
@@ -63,7 +65,8 @@ func init() {
 	}
 	if VERBOSE {
 		indented, _ := json.MarshalIndent(APP, "", "    ")
-		log.Println(string(indented))
+		log.Println("App data: ", string(indented))
+		log.Println("VERBOSE=false to suppress previous log")
 	}
 
 	log.Println("Fixerworker initialized...")
