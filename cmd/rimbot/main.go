@@ -3,7 +3,9 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"os"
 
@@ -11,38 +13,59 @@ import (
 )
 
 const root = "/rimbot/"
+const dialogFlowRoot = "https://api.dialogflow.com/v1/query" //NOTE: protocol number is "required", consider adding it
 
 var err error
 
 //Rimbot - TODO
 func Rimbot(w http.ResponseWriter, r *http.Request) {
-	status := http.StatusOK
 	//obtain slacks' webhook
 	err = r.ParseForm()
 	if err != nil {
-		status = http.StatusBadRequest
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 	form := r.Form
 
 	//convert webhook values into new outgoing message
 
+	//TODO generate sessionId every time.
+
 	out := struct {
-		Text string `json:"text"`
-	}{
-		form.Get("text"),
-	}
+		Query     string `json:"query"`
+		SessionID int    `json:"sessionId"`
+	}{form.Get("text"), rand.Intn(10000)}
+
+	fmt.Printf("%+v\n", out)
 
 	//Prepare outgoing message
 	text, err := json.Marshal(out)
 	if err != nil {
-		status = http.StatusInternalServerError
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 	outBody := ioutil.NopCloser(bytes.NewBuffer(text))
 
 	//post message
-	http.Post("http://webhook.site/323a95e0-a2f3-4e67-9668-882642f51319", "application/json", outBody)
+	req, err := http.NewRequest(http.MethodPost, dialogFlowRoot, outBody)
 
-	w.WriteHeader(status)
+	if err != nil {
+		panic(err)
+	}
+
+	req.Header.Add("Authorization", "Bearer "+os.Getenv("ACCESS_TOKEN"))
+	req.Header.Add("Content-Type", "application/json")
+	response, err := http.DefaultClient.Do(req)
+	if err != nil {
+		w.WriteHeader(http.StatusFailedDependency) //NOTE: is this right?
+		return
+	}
+	respBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		panic(err)
+	}
+	w.Header().Add("Content-Type", "application/json")
+	w.Write(respBody)
 }
 
 func main() {
