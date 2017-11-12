@@ -4,7 +4,8 @@
 		"goVersion": "go1.9",
 		"install": [
 			"./cmd/webhookserver",
-			"./cmd/fixerworker"
+			"./cmd/fixerworker",
+			"./cmd/rimbot"
 		]
 	},
 	"ignore": "test",
