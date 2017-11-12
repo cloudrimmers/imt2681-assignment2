@@ -14,11 +14,12 @@ import "gopkg.in/mgo.v2/bson"
 		"ZAR":16.14
     }
 }
+ See example in config/fixer.json
 */
 type FixerIn struct {
 	ID        bson.ObjectId      `json:"id" bson:"_id,omitempty"`
-	Base      string             `bson:"base"`
 	Timestamp string             `bson:"timestamp,omitempty"`
+	Base      string             `bson:"base"`
 	Date      string             `bson:"date"`
-	Rates     map[string]float64 `bson:"rates"`
+	Rates     map[string]float32 `bson:"rates"`
 }

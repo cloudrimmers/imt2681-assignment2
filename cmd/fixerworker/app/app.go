@@ -2,22 +2,21 @@ package app
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
 
-	"github.com/Arxcis/imt2681-assignment2/lib/database"
-	"github.com/Arxcis/imt2681-assignment2/lib/invoke"
-	"github.com/Arxcis/imt2681-assignment2/lib/types"
+	"github.com/cloudrimmers/imt2681-assignment3/lib/database"
+	"github.com/cloudrimmers/imt2681-assignment3/lib/types"
 )
 
 // App ...
 type App struct {
-	FixerioURI        string
-	CollectionWebhook string
-	CollectionFixer   string
-	Mongo             database.Mongo
-	Seed              []types.FixerIn
+	FixerioURI          string
+	CollectionFixerName string
+	Mongo               database.Mongo
+	Seedpath            string
 }
 
 // Fixer2Mongo ...
@@ -38,34 +37,48 @@ func (app *App) Fixer2Mongo() {
 		return
 	}
 
-	// 3. Connect to DB
-	dbsession, err := app.Mongo.Open()
+	// @TODO 3 Validate incomming data
+
+	// 4. Connect to DB
+	collectionFixer, err := app.Mongo.OpenC(app.CollectionFixerName)
 	defer app.Mongo.Close()
 	if err != nil {
 		log.Println("ERROR Database no connection: ", err.Error())
 		return
 	}
 
+	// 5. Timestamp
 	payload.Timestamp = time.Now().String()
 
-	// 5. Dump payload to database
-	err = dbsession.C(app.CollectionFixer).Insert(payload)
+	// 6. Dump payload to database
+	err = collectionFixer.Insert(payload)
 	if err != nil {
 		log.Println("ERROR on db.Insert():\n", err.Error())
 		return
 	}
 	log.Println("SUCCESS pulling fixer.io: ", payload)
-
-	// 6. Fire webhooks
-	client := &http.Client{}
-	invoke.Webhooks(client, dbsession.C(app.CollectionWebhook), dbsession.C(app.CollectionFixer))
 }
 
 // SeedFixer ...
 func (app *App) SeedFixer() {
 
+	// 0. Get seed
+	seed := func() []types.FixerIn {
+		log.Println("Reading " + app.Seedpath)
+		data, err := ioutil.ReadFile(app.Seedpath)
+		if err != nil {
+			panic(err.Error())
+		}
+		var fixerin []types.FixerIn
+		if err = json.Unmarshal(data, &fixerin); err != nil {
+			panic(err.Error())
+		}
+		log.Println("Done with " + app.Seedpath)
+		return fixerin
+	}()
+
 	// 1. Open collection
-	collection, err := app.Mongo.OpenC(app.CollectionFixer)
+	collectionFixer, err := app.Mongo.OpenC(app.CollectionFixerName)
 	if err != nil {
 		log.Println(err.Error())
 		return
@@ -74,8 +87,8 @@ func (app *App) SeedFixer() {
 
 	// 2. Insert to database
 	// cfixer.DropCollection()
-	for _, o := range app.Seed {
-		if err = collection.Insert(o); err != nil {
+	for _, o := range seed {
+		if err = collectionFixer.Insert(o); err != nil {
 			log.Println("Unable to db.Insert seed")
 		}
 	}

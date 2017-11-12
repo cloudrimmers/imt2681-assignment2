@@ -2,59 +2,61 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
 
-	"github.com/Arxcis/imt2681-assignment2/cmd/fixerworker/app"
-	"github.com/Arxcis/imt2681-assignment2/lib/database"
-	"github.com/Arxcis/imt2681-assignment2/lib/types"
+	"github.com/cloudrimmers/imt2681-assignment3/cmd/fixerworker/app"
+	"github.com/cloudrimmers/imt2681-assignment3/lib/database"
+	"github.com/subosito/gotenv"
 
-	"github.com/Arxcis/imt2681-assignment2/lib/tool"
+	"github.com/cloudrimmers/imt2681-assignment3/lib/tool"
 )
 
-// APP - global state pbject
+// READENV read environment from .env file
+const READENV = false
+
+// SEED the database with testdata
+const SEED = false
+
+// VERBOSE log more to console
+const VERBOSE = false
+
+// APP - configuration data
 var APP *app.App
 var err error
 
 func init() {
 	log.Println("Fixerworker booting up...")
 
-	//log.Println("Reading .env")
-	//gotenv.MustLoad(".env")
-	//log.Println("Done with .env")
+	if READENV {
+		log.Println("Reading .env")
+		gotenv.MustLoad(".env")
+		log.Println("Done with .env")
+	}
 
-	configpath := "./config/seedfixer.json"
+	// Initialize the app object
 	APP = &app.App{
-		FixerioURI:        os.Getenv("FIXERIO_URI"),
-		CollectionWebhook: os.Getenv("COLLECTION_WEBHOOK"),
-		CollectionFixer:   os.Getenv("COLLECTION_FIXER"),
+		FixerioURI:          "https://api.fixer.io/latest",
+		CollectionFixerName: "fixer",
 		Mongo: database.Mongo{
 			Name:    os.Getenv("MONGODB_NAME"),
 			URI:     os.Getenv("MONGODB_URI"),
 			Session: nil,
 		},
-		Seed: func() []types.FixerIn {
-			log.Println("Reading " + configpath)
-			data, err := ioutil.ReadFile(configpath)
-			if err != nil {
-				panic(err.Error())
-			}
-			var fixerin []types.FixerIn
-			if err = json.Unmarshal(data, &fixerin); err != nil {
-				panic(err.Error())
-			}
-			log.Println("Done with " + configpath)
-			return fixerin
-		}(),
+		Seedpath: "./config/fixer.json",
 	}
-	//APP.SeedFixer() // @note enable/disable
-	APP.Mongo.EnsureIndex(APP.CollectionFixer, []string{"date"})
 
-	//@verbose
-	//	indented, _ := json.MarshalIndent(APP, "", "    ")
-	//	log.Println(string(indented))
+	APP.Mongo.EnsureIndex(APP.CollectionFixerName, []string{"date"})
+
+	if SEED {
+		APP.SeedFixer()
+	}
+	if VERBOSE {
+		indented, _ := json.MarshalIndent(APP, "", "    ")
+		log.Println(string(indented))
+	}
+
 	log.Println("Fixerworker initialized...")
 }
 
@@ -68,7 +70,7 @@ func main() {
 		targetWait += time.Minute
 		log.Println("T wait  : ", targetWait.String())
 
-		if targetWait > 0 {
+		if targetWait >= 0 {
 			targetWait = -tool.UntilTomorrow()
 			APP.Fixer2Mongo()
 		}
