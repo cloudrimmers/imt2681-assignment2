@@ -24,10 +24,11 @@
 | slack.com | chat and collaboration service
 
 
-### Install
+### Install and setup environment
 
 1. Create `.env` file in root directory, *example:*
 ```
+PORT=5000
 MONGODB_URI=mongodb://localhost
 MONGODB_NAME=test
 ```
@@ -47,6 +48,13 @@ clock: fixerworker
 ```
 heroku local
 ```
+
+5. Set heroku cloud environment variables
+```
+heroku config:set MONGODB_URI=mongodb://xxxxxxx
+heroku config:set MONGODB_NAME=xxxxx
+```
+
 
 ### High level system overview
 
