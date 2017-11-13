@@ -101,8 +101,8 @@ const (
 )
 
 //Query DialogFlow for a conversion
-func Query(queryText string) (responseObject Response, statusCode int) {
-	responseObject = Response{} //prepare responseObject
+func Query(queryText string) (base string, target string, amount float64, statusCode int) {
+	responseObject := Response{} //prepare responseObject
 
 	query := newQuery(queryText)
 
@@ -153,6 +153,9 @@ func Query(queryText string) (responseObject Response, statusCode int) {
 		responseObject = Response{}
 		return
 	}
+	base = responseObject.Result.Parameters.CurrencyIn.CurrencyName
+	target = responseObject.Result.Parameters.CurrencyOut.CurrencyName
+	amount = responseObject.Result.Parameters.Amount
 
 	statusCode = responseObject.Status.Code
 	return
