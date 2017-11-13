@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -21,12 +20,13 @@ func init() {
 	const configpath = "./config/currency.json"
 
 	APP = &app.App{
+		Port:                os.Getenv("PORT"),
 		CollectionFixerName: "fixer",
 		Mongo: database.Mongo{
 			Name:    os.Getenv("MONGODB_NAME"),
 			URI:     os.Getenv("MONGODB_URI"),
 			Session: nil,
-		}
+		},
 	}
 
 	// 3. Default values if empty environment

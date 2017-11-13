@@ -24,7 +24,6 @@ var testid bson.ObjectId
 func init() {
 
 	const envpath = "../../../.env"
-	const configpath = "../../../config/currency.json"
 
 	// 1. Require .env to be present
 	log.Println("Reading .env")
@@ -38,18 +37,6 @@ func init() {
 			Name:    os.Getenv("MONGODB_NAME"),
 			Session: nil,
 		},
-		Currency: func() []string {
-			log.Println("Reading " + configpath)
-			data, err := ioutil.ReadFile(configpath)
-			if err != nil {
-				panic(err.Error())
-			}
-			var currency []string
-			if err = json.Unmarshal(data, &currency); err != nil {
-				panic(err.Error())
-			}
-			return currency
-		}(),
 	}
 
 	// 3. Default values if empty environment
