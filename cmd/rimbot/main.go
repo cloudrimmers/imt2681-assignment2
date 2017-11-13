@@ -34,9 +34,9 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 	out := struct {
 		Query     string `json:"query"`
 		SessionID int    `json:"sessionId"`
-	}{form.Get("text"), rand.Intn(10000)}
+	}{form.Get("text"), rand.Intn(10000)} //Generate random SessionID.
 
-	fmt.Printf("%+v\n", out)
+	fmt.Printf("%+v\n", out) //Print the body that will be sent to DialigFlow.
 
 	//Prepare outgoing message
 	text, err := json.Marshal(out)
@@ -44,18 +44,18 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	outBody := ioutil.NopCloser(bytes.NewBuffer(text))
+	outBody := ioutil.NopCloser(bytes.NewBuffer(text)) //Create new body with text to send dialogflow.
 
 	//post message
-	req, err := http.NewRequest(http.MethodPost, dialogFlowRoot, outBody)
+	req, err := http.NewRequest(http.MethodPost, dialogFlowRoot, outBody) //Creates new request with body.
 
 	if err != nil {
 		panic(err)
 	}
 
-	req.Header.Add("Authorization", "Bearer "+os.Getenv("ACCESS_TOKEN"))
+	req.Header.Add("Authorization", "Bearer "+os.Getenv("ACCESS_TOKEN")) //Add authorization token to head. Identifies agent in dialogflow.
 	req.Header.Add("Content-Type", "application/json")
-	response, err := http.DefaultClient.Do(req)
+	response, err := http.DefaultClient.Do(req) //Execute request.
 	if err != nil {
 		w.WriteHeader(http.StatusFailedDependency) //NOTE: is this right?
 		return
