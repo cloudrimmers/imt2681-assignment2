@@ -16,7 +16,7 @@ import (
 type query struct {
 	Query     string   `json:"query"`
 	Context   []string `json:"contexts,omitempty"` //may be omitted, context may be implicit
-	SessionID int      `json:"sessionId"`
+	SessionID string   `json:"sessionId"`
 }
 
 // Generate query object to send into dialogFlow
@@ -27,8 +27,8 @@ func newQuery(text string) *query {
 	}
 }
 
-func generateSessionID() int {
-	return rand.Intn(10000)
+func generateSessionID() string {
+	return strconv.Itoa(rand.Intn(10000))
 }
 
 /*
@@ -73,10 +73,10 @@ func generateSessionID() int {
 type Response struct {
 	Query  string `json:"query"`
 	Result struct {
-		//ADDITIONAL PARAMETERS
-		Parameters struct { //These may vary... should we use a map perhaps
+		//NOTE: If need be, place ADDITIONAL PARAMETERS
+		Parameters struct {
 			CurrencyOut struct {
-				CurrencyName string `json:"currency-name,omitempty"`
+				CurrencyName string `json:"currency-name"`
 			} `json:"currency-out"`
 			CurrencyIn struct {
 				CurrencyName string `json:"currency-name"`
