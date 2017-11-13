@@ -22,7 +22,7 @@ type App struct {
 
 var err error
 
-// FixerResponse ....
+// FixerResponse ...
 func (app *App) FixerResponse(uri string) (*types.FixerIn, error) {
 	// 1. Connect and request to fixer.io
 	resp, _ := http.Get(uri)
