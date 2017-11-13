@@ -72,6 +72,21 @@ git add . && git commit -m "a message"
 git push heroku master
 ```
 
+### Install dependencies on Ubuntu 17.10
+```
+snap install mongo33
+snap install go
+go get github.com/gorilla/mux
+go get github.com/subosito/gotenv
+go get gopkg.in/mgo.v2
+go get github.com/kardianos/govendor
+
+# Dev dependencies
+apt-get install git
+snap install heroku 
+snap install docker
+```
+
 ### High level system overview
 
 
