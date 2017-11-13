@@ -55,11 +55,11 @@ func TestGetLatestCurrency(t *testing.T) {
 
 	// 1. Setup router
 	r := mux.NewRouter()
-	r.HandleFunc("/currency/latest", APP.GetLatestCurrency).Methods("POST")
+	r.HandleFunc("/currency/latest/", APP.GetLatestCurrency).Methods("POST")
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	url := ts.URL + "/currency/latest"
+	url := ts.URL + "/currency/latest/"
 	t.Log("Testing", url)
 
 	// @TODO - change the POST request to a GET request
@@ -77,6 +77,7 @@ func TestGetLatestCurrency(t *testing.T) {
 	for postBody, wantedStatus := range table {
 		byteBody, _ := json.Marshal(postBody)
 		t.Run(string(byteBody), func(t *testing.T) {
+
 			resp, err := http.Post(url, "application/json", bytes.NewReader(byteBody))
 			if err != nil {
 				t.Fatal(err)
