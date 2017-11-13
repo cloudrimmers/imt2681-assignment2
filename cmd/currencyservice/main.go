@@ -17,6 +17,7 @@ var APP *app.App
 
 func init() {
 	const VERBOSE = true
+	const SEED = true
 	const configpath = "./config/currency.json"
 
 	APP = &app.App{
@@ -41,6 +42,11 @@ func init() {
 		indented, _ := json.MarshalIndent(APP, "", "    ")
 		log.Println("App data: ", string(indented))
 	}
+
+	if SEED {
+		_ = APP.SeedTestDB()
+	}
+
 	log.Println("Currencyservice initialized...")
 }
 

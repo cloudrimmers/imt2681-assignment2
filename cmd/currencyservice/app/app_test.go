@@ -47,7 +47,7 @@ func init() {
 	}
 
 	log.Println("Seeding DB")
-	seedTestDB()
+	APP.SeedTestDB()
 
 	log.Println("TEST currencyservice initialized...")
 }
@@ -97,44 +97,4 @@ func TestGetLatestCurrency(t *testing.T) {
 		}
 	})
 
-}
-
-func seedTestDB() error {
-
-	collectionFixer, err := APP.Mongo.OpenC(APP.CollectionFixerName)
-	if err != nil {
-		return err
-	}
-	defer APP.Mongo.Close()
-
-	collectionFixer.DropCollection()
-	collectionFixer.Insert(bson.M{
-		"base": "EUR",
-		"date": "2017-10-24",
-		"rates": map[string]float64{
-			"NOK": 9.3883,
-			"TRY": 4.3751,
-			"USD": 1.1761,
-			"ZAR": 16.14,
-		},
-	}, bson.M{
-		"base": "EUR",
-		"date": "2017-10-23",
-		"rates": map[string]float64{
-			"NOK": 9.3883,
-			"TRY": 4.3751,
-			"USD": 1.1761,
-			"ZAR": 16.14,
-		},
-	}, bson.M{
-		"base": "EUR",
-		"date": "2017-10-22",
-		"rates": map[string]float64{
-			"NOK": 9.3883,
-			"TRY": 4.3751,
-			"USD": 1.1761,
-			"ZAR": 16.14,
-		},
-	})
-	return nil
 }
