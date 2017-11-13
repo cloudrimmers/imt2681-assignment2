@@ -52,7 +52,7 @@ func URI(uri string) error {
 	if regex.MatchString(uri) {
 		return nil
 	}
-	return fmt.Errorf("REGEX did not match with URI")
+	return fmt.Errorf("INVALID URI not supported")
 }
 
 // Currency ...
@@ -63,5 +63,5 @@ func Currency(currency string) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("currency not supported")
+	return fmt.Errorf("INVALID currency not supported")
 }
