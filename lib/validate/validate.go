@@ -5,8 +5,23 @@ import (
 	"regexp"
 )
 
+// Valid database URL regex
 var dbregex = "(mongodb:\\/\\/localhost(:\\d{1,5})?)|(127.0.0.1(:\\d{1,5})?)|(mongodb:\\/\\/heroku_(.*):(.*)@(.*).mlab.com:(\\d){1,5}\\/(.*))"
 
+// URI ...
+func URI(uri string) error {
+
+	regex, err := regexp.Compile(dbregex)
+	if err != nil {
+		return err
+	}
+	if regex.MatchString(uri) {
+		return nil
+	}
+	return fmt.Errorf("INVALID URI not supported")
+}
+
+// Valid currencies
 var currencies = [...]string{
 	"EUR",
 	"AUD",
@@ -40,19 +55,6 @@ var currencies = [...]string{
 	"TRY",
 	"USD",
 	"ZAR",
-}
-
-// URI ...
-func URI(uri string) error {
-
-	regex, err := regexp.Compile(dbregex)
-	if err != nil {
-		return err
-	}
-	if regex.MatchString(uri) {
-		return nil
-	}
-	return fmt.Errorf("INVALID URI not supported")
 }
 
 // Currency ...
