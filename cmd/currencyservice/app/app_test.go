@@ -1,9 +1,11 @@
 package app
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
@@ -11,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/cloudrimmers/imt2681-assignment3/lib/database"
+	"github.com/cloudrimmers/imt2681-assignment3/lib/types"
 	"github.com/subosito/gotenv"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -73,39 +76,38 @@ func TestGetLatestCurrency(t *testing.T) {
 	t.Log("Testing", url)
 
 	// @TODO - change the POST request to a GET request
-	/*	// 2. Define table
-		table := map[types.CurrencyIn]int{
-			//{BaseCurrency: "RAR", TargetCurrency: "NOK"}: http.StatusBadRequest, //@todo - This should be handled as a bad request
-			{BaseCurrency: "EUR", TargetCurrency: "EUR"}: http.StatusBadRequest,
-			{BaseCurrency: "AAA", TargetCurrency: "EUR"}: http.StatusBadRequest,
-			{BaseCurrency: "EUR", TargetCurrency: "AAA"}: http.StatusBadRequest,
-			{BaseCurrency: "USD", TargetCurrency: "EUR"}: http.StatusNotFound,
-			{BaseCurrency: "EUR", TargetCurrency: "NOK"}: http.StatusOK,
-		}
+	// 2. Define table
+	table := map[types.CurrencyIn]int{
+		//{BaseCurrency: "RAR", TargetCurrency: "NOK"}: http.StatusBadRequest, //@todo - This should be handled as a bad request
+		{BaseCurrency: "EUR", TargetCurrency: "EUR"}: http.StatusBadRequest,
+		{BaseCurrency: "AAA", TargetCurrency: "EUR"}: http.StatusBadRequest,
+		{BaseCurrency: "EUR", TargetCurrency: "AAA"}: http.StatusBadRequest,
+		{BaseCurrency: "USD", TargetCurrency: "EUR"}: http.StatusNotFound,
+		{BaseCurrency: "EUR", TargetCurrency: "NOK"}: http.StatusOK,
+	}
 
-		// 3. Run tests
-		for postBody, wantedStatus := range table {
-			byteBody, _ := json.Marshal(postBody)
-			t.Run(string(byteBody), func(t *testing.T) {
-				resp, err := http.Post(url, "application/json", bytes.NewReader(byteBody))
-				if err != nil {
-					t.Fatal(err)
-				}
+	// 3. Run tests
+	for postBody, wantedStatus := range table {
+		byteBody, _ := json.Marshal(postBody)
+		t.Run(string(byteBody), func(t *testing.T) {
+			resp, err := http.Post(url, "application/json", bytes.NewReader(byteBody))
+			if err != nil {
+				t.Fatal(err)
+			}
 
-				if resp.StatusCode != wantedStatus {
-					t.Fatalf("Wrong status code. Got %d want %d", resp.StatusCode, wantedStatus)
-				}
-			})
-		}
-
-		malformedString := "sdjføalsjfløsajdfløjslødj"
-		t.Run("Malformed request: "+malformedString, func(t *testing.T) {
-			resp, _ := http.Post(url, "application/json", ioutil.NopCloser(bytes.NewBufferString(malformedString)))
-			if resp.StatusCode != http.StatusBadRequest {
-				t.Fatalf("Wrong status code. Got %d want %d", http.StatusBadRequest, resp.StatusCode)
+			if resp.StatusCode != wantedStatus {
+				t.Fatalf("Wrong status code. Got %d want %d", resp.StatusCode, wantedStatus)
 			}
 		})
-	*/
+	}
+
+	malformedString := "sdjføalsjfløsajdfløjslødj"
+	t.Run("Malformed request: "+malformedString, func(t *testing.T) {
+		resp, _ := http.Post(url, "application/json", ioutil.NopCloser(bytes.NewBufferString(malformedString)))
+		if resp.StatusCode != http.StatusBadRequest {
+			t.Fatalf("Wrong status code. Got %d want %d", http.StatusBadRequest, resp.StatusCode)
+		}
+	})
 
 }
 

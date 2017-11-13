@@ -26,20 +26,7 @@ func init() {
 			Name:    os.Getenv("MONGODB_NAME"),
 			URI:     os.Getenv("MONGODB_URI"),
 			Session: nil,
-		},
-		Currency: func() []string {
-			log.Println("Reading " + configpath)
-			data, err := ioutil.ReadFile(configpath)
-			if err != nil {
-				panic(err.Error())
-			}
-			var currency []string
-			if err = json.Unmarshal(data, &currency); err != nil {
-				panic(err.Error())
-			}
-			log.Println("Done with " + configpath)
-			return currency
-		}(),
+		}
 	}
 
 	// 3. Default values if empty environment
@@ -59,6 +46,6 @@ func init() {
 
 func main() {
 	router := mux.NewRouter().StrictSlash(false)
-	router.HandleFunc("/currency/latest", APP.GetLatestCurrency).Methods("GET")
+	router.HandleFunc("/currency/latest", APP.GetLatestCurrency).Methods("POST")
 	log.Println(http.ListenAndServe(":"+APP.Port, router))
 }
