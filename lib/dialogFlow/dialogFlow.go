@@ -15,16 +15,17 @@ import (
 // query - Queries to DialogFlow use this kind of body
 type query struct {
 	Query     string   `json:"query"`
-	Context   []string `json:"contexts,omitempty"` //may be omitted, context may be implicit
+	Contexts  []string `json:"contexts,omitempty"` //may be omitted, context may be implicit
 	SessionID string   `json:"sessionId"`
 }
 
 // Generate query object to send into dialogFlow
-func newQuery(text string) *query {
-	return &query{
-		Query:     text,
-		SessionID: generateSessionID(),
-	}
+func newQuery(text string, contexts ...string) *query {
+	qry := new(query)
+	qry.Query = text
+	qry.Contexts = contexts
+	qry.SessionID = generateSessionID()
+	return qry
 }
 
 func generateSessionID() string {

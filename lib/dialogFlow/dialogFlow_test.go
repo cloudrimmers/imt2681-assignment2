@@ -18,7 +18,7 @@ func TestNewQuery(t *testing.T) {
 			if test != qry.Query {
 				wanted := query{
 					Query:     test,
-					Context:   qry.Context,
+					Contexts:  qry.Contexts,
 					SessionID: qry.SessionID,
 				}
 				t.Errorf("newQuery() = %v want %v", qry, wanted)
@@ -26,7 +26,7 @@ func TestNewQuery(t *testing.T) {
 			if len(qry.SessionID) <= 0 {
 				wanted := query{
 					Query:     test,
-					Context:   qry.Context,
+					Contexts:  qry.Contexts,
 					SessionID: "NOT EMPTY",
 				}
 				t.Errorf("newQuery() = %v want %v", qry, wanted)

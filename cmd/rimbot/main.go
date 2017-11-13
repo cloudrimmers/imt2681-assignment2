@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -31,9 +32,20 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 	}
 	test := fmt.Sprintf("Response got:\n%v\t%v\t%v", base, target, amount)
 
-	fmt.Println("test: ", test)
-	w.Write([]byte(test))
+	//Here goes validation of base, target, and amount.
 
+	//Here goes communication with Currencyservice.
+
+	slackTo := struct {
+		Text     string `json:"text"`
+		Username string `json:"username,omitempty"`
+	}{test, "Rimbot"}
+
+	outgoing, err := json.Marshal(slackTo)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	w.Write(outgoing)
 }
 
 func main() {
