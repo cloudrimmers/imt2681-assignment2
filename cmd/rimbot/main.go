@@ -10,7 +10,6 @@ import (
 )
 
 const root = "/rimbot/"
-const dialogFlowRoot = "https://api.dialogflow.com/v1/query" //NOTE: protocol number is "required", consider adding it
 
 var err error
 

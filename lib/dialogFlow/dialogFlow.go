@@ -3,6 +3,7 @@ package dialogFlow
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -98,17 +99,18 @@ const (
 	ProtocolNumeric = 20170712
 )
 
-//Query DialogFlow
+//Query DialogFlow for a conversion
 func Query(queryText string) (responseObject Response, statusCode int) {
-	responseObject = Response{}
+	responseObject = Response{} //prepare responseObject
 
 	query, err := json.Marshal(newQuery(queryText))
 	if err != nil {
 		statusCode = http.StatusInternalServerError
 		return
 	}
+	fmt.Printf("%+v\n", query) //Print the body that will be sent to DialigFlow.
 
-	//Construct a request
+	//Construct a request with our query object
 	req, err := http.NewRequest(
 		http.MethodPost,
 		dialogFlowRoot+strconv.Itoa(ProtocolNumeric),
@@ -119,10 +121,11 @@ func Query(queryText string) (responseObject Response, statusCode int) {
 		return
 	}
 
+	//Add authorization token to head. Identifies agent in dialogflow.
 	req.Header.Add("Authorization", "Bearer "+os.Getenv("ACCESS_TOKEN"))
 	req.Header.Add("Content-Type", "application/json")
 
-	response, err := http.DefaultClient.Do(req)
+	response, err := http.DefaultClient.Do(req) //Execute request.
 	if err != nil {
 		statusCode = http.StatusFailedDependency //NOTE: is this right? - yes it is!
 		return
