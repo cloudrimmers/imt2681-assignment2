@@ -3,11 +3,11 @@ LABEL maintainer="jonasjso@stud.ntnu.com"
 
 RUN apt-get update && apt-get -y upgrade
 
-
-# Copy and install code
-COPY . /code
-WORKDIR /code
-RUN ./script/install.sh
+# Install dependencies
+RUN go get github.com/gorilla/mux \
+    go get github.com/subosito/gotenv \
+    go get gopkg.in/mgo.v2 \
+    go get github.com/cloudrimmers/imt2681-assignment3
 
 # Run code
 WORKDIR $GOPATH
