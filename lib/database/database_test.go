@@ -23,15 +23,18 @@ func TestOpen(t *testing.T) {
 	mongo.Close()
 
 	// Test 2 - FAIL CASE
+
 	mongo = Mongo{Name: "test", URI: "trolololol", Session: nil}
 
 	_, err = mongo.Open()
-	fmt.Println("fkasdhflksdhfakshf", err.Error())
 	if err == nil {
+		defer mongo.Close()
 		t.Error(fmt.Errorf("ERROR Should not have been able to access database with URI: ", mongo.URI))
 	}
-	mongo.Close()
 
+	fmt.Println("opne(3)")
+
+	mongo = Mongo{Name: "test", URI: "127.0.0.1:33017", Session: nil}
 	// Test 2
 	_, err = mongo.OpenC("test")
 	if err != nil {
@@ -41,12 +44,19 @@ func TestOpen(t *testing.T) {
 }
 
 func TestEnsureIndex(t *testing.T) {
-	mongo := Mongo{Name: "test", URI: "127.", Session: nil}
 
-	// Test 3
+	mongo := Mongo{Name: "test", URI: "mongodb://127.0.0.1:33017", Session: nil}
 	err = mongo.EnsureIndex("test", []string{"id"})
 	if err != nil {
 		t.Error(err.Error())
 	}
-	defer mongo.Close()
+	mongo.Close()
+
+	// FAIL TEST
+	mongo = Mongo{Name: "test", URI: "127.", Session: nil}
+	err = mongo.EnsureIndex("test", []string{"id"})
+	if err == nil {
+		defer mongo.Close()
+		t.Error(err.Error())
+	}
 }
