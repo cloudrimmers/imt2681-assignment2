@@ -104,18 +104,20 @@ const (
 func Query(queryText string) (base string, target string, amount float64, statusCode int) {
 	responseObject := Response{} //prepare responseObject
 
-	query, err := json.Marshal(newQuery(queryText))
+	query := newQuery(queryText)
+
+	encodedQuery, err := json.Marshal(query)
 	if err != nil {
 		statusCode = http.StatusInternalServerError
 		return
 	}
-	fmt.Printf("%+v\n", query) //Print the body that will be sent to DialigFlow.
+	fmt.Printf("%+v\n", encodedQuery) //Print the body that will be sent to DialigFlow.
 
 	//Construct a request with our query object
 	req, err := http.NewRequest(
 		http.MethodPost,
 		dialogFlowRoot+strconv.Itoa(ProtocolNumeric),
-		ioutil.NopCloser(bytes.NewBuffer(query)),
+		ioutil.NopCloser(bytes.NewBuffer(encodedQuery)),
 	)
 	if err != nil {
 		statusCode = http.StatusInternalServerError
@@ -145,10 +147,16 @@ func Query(queryText string) (base string, target string, amount float64, status
 		statusCode = http.StatusInternalServerError
 		return
 	}
-
+	// DANGER!!! - someone
+	if responseObject.SessionID != query.SessionID {
+		statusCode = http.StatusUnauthorized
+		responseObject = Response{}
+		return
+	}
 	base = responseObject.Result.Parameters.CurrencyIn.CurrencyName
 	target = responseObject.Result.Parameters.CurrencyOut.CurrencyName
 	amount = responseObject.Result.Parameters.Amount
+
 	statusCode = responseObject.Status.Code
 	return
 }
