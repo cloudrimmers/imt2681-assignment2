@@ -28,9 +28,10 @@
 
 1. Create `.env` file in root directory, *example:*
 ```
-PORT=5000
-MONGODB_URI=mongodb://localhost
-MONGODB_NAME=test
+export PORT=5000
+export MONGODB_URI=mongodb://localhost
+export MONGODB_NAME=test
+export ACCESS_TOKEN=k2lj3h43lk2jh432klh4   # clara's 
 ```
 
 2. Create `Procfile` for heroku in root directory, *example:*

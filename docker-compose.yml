@@ -1,0 +1,20 @@
+version: '3'
+services:
+  currencyservice:
+    build: ./cmd/currencyservice
+    port:
+      - "8080:8080"
+  rimbot:
+    build: ./cmd/rimbot
+    port:
+      - "8081:8081"
+
+  fixerworker:
+    build: ./cmd/fixerworker
+    port:
+      - "8082:8082"
+
+  mongo:
+    image: "mongo:latest"
+    port:
+      - "27017:27017"

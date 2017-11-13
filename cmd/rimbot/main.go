@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/cloudrimmers/imt2681-assignment3/cmd/rimbot/app"
 	"github.com/cloudrimmers/imt2681-assignment3/lib/dialogFlow"
 	"github.com/cloudrimmers/imt2681-assignment3/lib/validate"
 	"github.com/gorilla/mux"
@@ -66,7 +67,7 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/rimbot/", Rimbot).Methods(http.MethodPost)
+	r.HandleFunc(root, app.Rimbot).Methods(http.MethodPost)
 	http.Handle("/", r)
 
 	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
