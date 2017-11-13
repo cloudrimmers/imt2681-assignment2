@@ -73,7 +73,6 @@ func (app *App) SeedFixerdata() {
 		if err = json.Unmarshal(data, &fixerin); err != nil {
 			panic(err.Error())
 		}
-		log.Println("Done with " + app.Seedpath)
 		return fixerin
 	}()
 

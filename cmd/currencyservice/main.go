@@ -2,15 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/subosito/gotenv"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/Arxcis/imt2681-assignment2/cmd/webhookserver/app"
-
-	"github.com/Arxcis/imt2681-assignment2/lib/database"
+	"github.com/cloudrimmers/imt2681-assignment3/cmd/currencyservice/app"
+	"github.com/cloudrimmers/imt2681-assignment3/lib/database"
 
 	"github.com/gorilla/mux"
 )
@@ -19,21 +17,11 @@ import (
 var APP *app.App
 
 func init() {
-	log.Println("Webhookserver booting up...")
-
-	// Coment out when running on HEROKU cloud
-	if os.Getenv("IS_HEROKU") == "" {
-		log.Println("Reading .env")
-		gotenv.MustLoad(".env")
-		log.Println("Done with .env")
-	}
-
+	const VERBOSE = true
 	const configpath = "./config/currency.json"
+
 	APP = &app.App{
-		Path:              os.Getenv("API_PATH"),
-		Port:              os.Getenv("PORT"),
-		CollectionWebhook: os.Getenv("COLLECTION_WEBHOOK"),
-		CollectionFixer:   os.Getenv("COLLECTION_FIXER"),
+		CollectionFixerName: "fixer",
 		Mongo: database.Mongo{
 			Name:    os.Getenv("MONGODB_NAME"),
 			URI:     os.Getenv("MONGODB_URI"),
@@ -53,26 +41,24 @@ func init() {
 			return currency
 		}(),
 	}
-	// @verbose
-	// indented, _ := json.MarshalIndent(APP, "", "    ")
-	// log.Println(string(indented))
-	log.Println("Webhookserver initialized...")
+
+	// 3. Default values if empty environment
+	if APP.Mongo.URI == "" {
+		log.Println("No .env present. Using default values")
+		APP.Mongo.URI = "mongodb://localhost"
+		APP.Mongo.Name = "test"
+		APP.Port = "5000"
+	}
+
+	if VERBOSE {
+		indented, _ := json.MarshalIndent(APP, "", "    ")
+		log.Println("App data: ", string(indented))
+	}
+	log.Println("Currencyservice initialized...")
 }
 
 func main() {
-
 	router := mux.NewRouter().StrictSlash(false)
-
-	router.HandleFunc("/", APP.HelloWorld).Methods("GET")
-	router.HandleFunc(APP.Path+"", APP.PostWebhook).Methods("POST")
-	router.HandleFunc(APP.Path+"/", APP.GetWebhookAll).Methods("GET")
-	router.HandleFunc(APP.Path+"/{id}", APP.GetWebhook).Methods("GET")
-	router.HandleFunc(APP.Path+"/{id}", APP.DeleteWebhook).Methods("DELETE")
-	// router.HandleFunc(APP.Path+"/trigger/evaluation", APP.EvaluationTrigger).Methods("GET")
-
-	router.HandleFunc(APP.Path+"/currency/latest", APP.GetLatestCurrency).Methods("POST")
-	router.HandleFunc(APP.Path+"/currency/average", APP.GetAverageCurrency).Methods("POST")
-
-	log.Println("port: ", APP.Port, "app.Path: ", APP.Path)
+	router.HandleFunc("/currency/latest", APP.GetLatestCurrency).Methods("GET")
 	log.Println(http.ListenAndServe(":"+APP.Port, router))
 }
