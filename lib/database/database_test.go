@@ -2,21 +2,24 @@ package database
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/subosito/gotenv"
 )
 
+var mongoURI string
+
 func init() {
 	gotenv.MustLoad("../../.env")
-
+	mongoURI = os.Getenv("MONGODB_URI")
 }
 func TestOpen(t *testing.T) {
 
-	mongo := Mongo{Name: "test", URI: "127.0.0.1:33017", Session: nil}
+	mongo := Mongo{Name: "test", URI: mongoURI, Session: nil}
 
 	// Test 1 - Open() - SUCCESS CASE
-	_, err := mongo.Open()
+	_, err = mongo.Open()
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -29,12 +32,12 @@ func TestOpen(t *testing.T) {
 	_, err = mongo.Open()
 	if err == nil {
 		defer mongo.Close()
-		t.Error(fmt.Errorf("ERROR Should not have been able to access database with URI: ", mongo.URI))
+		t.Error("ERROR Should not have been able to access database with URI: ", mongo.URI)
 	}
 
 	fmt.Println("opne(3)")
 
-	mongo = Mongo{Name: "test", URI: "127.0.0.1:33017", Session: nil}
+	mongo = Mongo{Name: "test", URI: mongoURI, Session: nil}
 	// Test 2
 	_, err = mongo.OpenC("test")
 	if err != nil {
@@ -45,7 +48,7 @@ func TestOpen(t *testing.T) {
 
 func TestEnsureIndex(t *testing.T) {
 
-	mongo := Mongo{Name: "test", URI: "mongodb://127.0.0.1:33017", Session: nil}
+	mongo := Mongo{Name: "test", URI: mongoURI, Session: nil}
 	err = mongo.EnsureIndex("test", []string{"id"})
 	if err != nil {
 		t.Error(err.Error())
