@@ -3,8 +3,6 @@
 	"heroku": {
 		"goVersion": "go1.9",
 		"install": [
-			"./cmd/webhookserver",
-			"./cmd/fixerworker",
 			"./cmd/rimbot"
 		]
 	},
