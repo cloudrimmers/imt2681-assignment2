@@ -100,8 +100,8 @@ const (
 )
 
 //Query DialogFlow for a conversion
-func Query(queryText string) (responseObject Response, statusCode int) {
-	responseObject = Response{} //prepare responseObject
+func Query(queryText string) (base string, target string, amount float64, statusCode int) {
+	responseObject := Response{} //prepare responseObject
 
 	query, err := json.Marshal(newQuery(queryText))
 	if err != nil {
@@ -144,6 +144,10 @@ func Query(queryText string) (responseObject Response, statusCode int) {
 		statusCode = http.StatusInternalServerError
 		return
 	}
+
+	base = responseObject.Result.Parameters.CurrencyIn.CurrencyName
+	target = responseObject.Result.Parameters.CurrencyOut.CurrencyName
+	amount = responseObject.Result.Parameters.Amount
 	statusCode = responseObject.Status.Code
 	return
 }

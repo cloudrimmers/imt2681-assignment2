@@ -24,14 +24,16 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 	form := r.Form
 
 	//convert webhook values into new outgoing message
-	response, code := dialogFlow.Query(form.Get("text"))
+	base, target, amount, code := dialogFlow.Query(form.Get("text"))
 	if code != http.StatusOK {
 		w.WriteHeader(code)
 		return
 	}
-	test := fmt.Sprintf("Response got:\n%+v", response.Result.Parameters)
+	test := fmt.Sprintf("Response got:\n%v\t%v\t%v", base, target, amount)
 
+	fmt.Println("test: ", test)
 	w.Write([]byte(test))
+
 }
 
 func main() {
