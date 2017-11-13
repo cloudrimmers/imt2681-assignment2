@@ -77,12 +77,12 @@ type Response struct {
 		//NOTE: If need be, place ADDITIONAL PARAMETERS
 		Parameters struct {
 			CurrencyOut struct {
-				CurrencyName string `json:"currency-name"`
+				CurrencyName string `json:"currency-name,omitempty"`
 			} `json:"currency-out"`
 			CurrencyIn struct {
-				CurrencyName string `json:"currency-name"`
+				CurrencyName string `json:"currency-name,omitempty"`
 			} `json:"currency-in"`
-			Amount float64 `json:"amount"`
+			Amount float64 `json:"amount,omitempty"`
 		} `json:"parameters"`
 	} `json:"result"`
 	Status struct {
@@ -144,7 +144,7 @@ func Query(queryText string) (base string, target string, amount float64, status
 	if err != nil {
 		log.Println(err)
 		log.Printf("failed unmarshalling response:\n%+v", responseObject)
-		statusCode = http.StatusInternalServerError
+		statusCode = http.StatusPartialContent
 		return
 	}
 	// DANGER!!! - someone
