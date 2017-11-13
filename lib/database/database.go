@@ -3,6 +3,7 @@ package database
 import (
 	"log"
 
+	"github.com/cloudrimmers/imt2681-assignment3/lib/validate"
 	"gopkg.in/mgo.v2"
 )
 
@@ -18,10 +19,16 @@ type Mongo struct {
 // Open ...
 func (mongo *Mongo) Open() (*mgo.Database, error) {
 
+	err = validate.URI(mongo.URI)
+	if err != nil {
+		return nil, err
+	}
+
 	mongo.Session, err = mgo.Dial(mongo.URI)
 	if err != nil {
 		return nil, err
 	}
+
 	log.Println("Database connection established...")
 	mongo.Session.SetMode(mgo.Monotonic, true) // @note not sure what this is, but many people use it
 	return mongo.Session.DB(mongo.Name), nil
@@ -47,11 +54,17 @@ func (mongo *Mongo) OpenC(cName string) (*mgo.Collection, error) {
 
 // EnsureIndex ...
 func (mongo *Mongo) EnsureIndex(cName string, keys []string) error {
+
+	// validate url
+	err = validate.URI(mongo.URI)
+	if err != nil {
+		return err
+	}
+
 	// 1. Open collection
 	log.Println("Ensuring unique " + cName + " index")
 	collection, err := mongo.OpenC(cName)
 	if err != nil {
-		log.Println(err.Error())
 		return err
 	}
 	defer mongo.Close()
@@ -63,7 +76,6 @@ func (mongo *Mongo) EnsureIndex(cName string, keys []string) error {
 		DropDups: true,
 	})
 	if err != nil {
-		log.Println(err.Error())
 		return err
 	}
 	return nil
