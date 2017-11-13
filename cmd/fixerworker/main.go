@@ -35,7 +35,7 @@ func init() {
 
 	// 3. Default values if empty environment
 	if APP.Mongo.URI == "" {
-		APP.Mongo.URI = "mongodb://localhost:33017"
+		APP.Mongo.URI = "mongodb://localhost"
 		APP.Mongo.Name = "test"
 		log.Println("No .env present. Using default values")
 	}
@@ -68,8 +68,15 @@ func main() {
 
 		if targetWait >= 0 {
 			targetWait = -(timetool.UntilTomorrow())
+			response, err := APP.FixerResponse(APP.FixerioURI)
 
-			APP.Fixer2Mongo()
+			if err != nil {
+				log.Println("ERROR FixerResponse()")
+			} else if err = APP.Fixer2Mongo(response); err != nil {
+				log.Println("ERROR Fixer2Mongo()")
+			} else {
+				log.Println("SUCCESS pulling fixer.io: ", response)
+			}
 		}
 	}
 }

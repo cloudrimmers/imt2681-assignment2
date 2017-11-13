@@ -18,7 +18,6 @@ var APP *app.App
 func init() {
 	const VERBOSE = true
 	const SEED = true
-	const configpath = "./config/currency.json"
 
 	APP = &app.App{
 		Port:                os.Getenv("PORT"),
@@ -33,9 +32,9 @@ func init() {
 	// 3. Default values if empty environment
 	if APP.Mongo.URI == "" {
 		log.Println("No .env present. Using default values")
+		APP.Port = "5000"
 		APP.Mongo.URI = "mongodb://localhost"
 		APP.Mongo.Name = "test"
-		APP.Port = "5000"
 	}
 
 	if VERBOSE {

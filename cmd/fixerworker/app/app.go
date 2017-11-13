@@ -9,6 +9,7 @@ import (
 
 	"github.com/cloudrimmers/imt2681-assignment3/lib/database"
 	"github.com/cloudrimmers/imt2681-assignment3/lib/types"
+	"github.com/cloudrimmers/imt2681-assignment3/lib/validate"
 )
 
 // App ...
@@ -19,44 +20,51 @@ type App struct {
 	Seedpath            string
 }
 
-// Fixer2Mongo ...
-func (app *App) Fixer2Mongo() {
+var err error
 
+// FixerResponse ...
+func (app *App) FixerResponse(uri string) (*types.FixerIn, error) {
 	// 1. Connect and request to fixer.io
-	resp, err := http.Get(app.FixerioURI)
+	resp, _ := http.Get(uri)
 	if err != nil {
-		log.Println("ERROR No connection with fixer.io: "+app.FixerioURI+" ...", err.Error())
-		return
+		return nil, err
 	}
 
 	// 2. Decode payload
-	payload := &(types.FixerIn{})
-	err = json.NewDecoder(resp.Body).Decode(payload)
+	responsebody := new(types.FixerIn)
+	err = json.NewDecoder(resp.Body).Decode(&responsebody)
 	if err != nil {
-		log.Println("ERROR Could not decode resp.Body...", err.Error())
-		return
+		return nil, err
 	}
 
+	return responsebody, nil
+}
+
+// Fixer2Mongo ...
+func (app *App) Fixer2Mongo(response *types.FixerIn) error {
+
 	// @TODO 3 Validate incomming data
+	if err = validate.Currency(response.Base); err != nil {
+		return err
+	}
 
 	// 4. Connect to DB
 	collectionFixer, err := app.Mongo.OpenC(app.CollectionFixerName)
 	defer app.Mongo.Close()
 	if err != nil {
-		log.Println("ERROR Database no connection: ", err.Error())
-		return
+		return err
 	}
 
 	// 5. Timestamp
-	payload.Timestamp = time.Now().String()
+	response.Timestamp = time.Now().String()
 
 	// 6. Dump payload to database
-	err = collectionFixer.Insert(payload)
+	err = collectionFixer.Insert(response)
 	if err != nil {
-		log.Println("ERROR on db.Insert():\n", err.Error())
-		return
+		return err
 	}
-	log.Println("SUCCESS pulling fixer.io: ", payload)
+
+	return nil
 }
 
 // SeedFixerdata ...
@@ -83,6 +91,7 @@ func (app *App) SeedFixerdata() {
 		return
 	}
 	defer app.Mongo.Close()
+	collectionFixer.DropCollection()
 
 	// 2. Insert to database
 	// cfixer.DropCollection()
