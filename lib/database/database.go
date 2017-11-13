@@ -1,8 +1,10 @@
 package database
 
 import (
+	"fmt"
 	"log"
 
+	"github.com/Arxcis/imt2681-assignment2/lib/validate"
 	"gopkg.in/mgo.v2"
 )
 
@@ -18,8 +20,12 @@ type Mongo struct {
 // Open ...
 func (mongo *Mongo) Open() (*mgo.Database, error) {
 
+	validate.URI()
+
 	mongo.Session, err = mgo.Dial(mongo.URI)
+
 	if err != nil {
+		fmt.Println("awerwerwererewrewrw", err.Error())
 		return nil, err
 	}
 	log.Println("Database connection established...")
@@ -51,7 +57,6 @@ func (mongo *Mongo) EnsureIndex(cName string, keys []string) error {
 	log.Println("Ensuring unique " + cName + " index")
 	collection, err := mongo.OpenC(cName)
 	if err != nil {
-		log.Println(err.Error())
 		return err
 	}
 	defer mongo.Close()
@@ -63,7 +68,6 @@ func (mongo *Mongo) EnsureIndex(cName string, keys []string) error {
 		DropDups: true,
 	})
 	if err != nil {
-		log.Println(err.Error())
 		return err
 	}
 	return nil
