@@ -49,12 +49,28 @@ clock: fixerworker
 heroku local
 ```
 
-5. Set heroku cloud environment variables
+5. a) If you do not have a running heroku app already:
+```
+heroku create
+git remote -v
+```
+
+5. b) Use existing heroku app by adding it as a remote in git
+```
+heroku git:remote <app_name>
+```
+
+6. Set heroku cloud environment variables
 ```
 heroku config:set MONGODB_URI=mongodb://xxxxxxx
 heroku config:set MONGODB_NAME=xxxxx
 ```
 
+7. Push changes and build re-build Heroku app
+```
+git add . && git commit -m "a message"
+git push heroku master
+```
 
 ### High level system overview
 
