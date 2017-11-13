@@ -38,18 +38,6 @@ func init() {
 			Name:    os.Getenv("MONGODB_NAME"),
 			Session: nil,
 		},
-		Currency: func() []string {
-			log.Println("Reading " + configpath)
-			data, err := ioutil.ReadFile(configpath)
-			if err != nil {
-				panic(err.Error())
-			}
-			var currency []string
-			if err = json.Unmarshal(data, &currency); err != nil {
-				panic(err.Error())
-			}
-			return currency
-		}(),
 	}
 
 	// 3. Default values if empty environment
@@ -68,11 +56,11 @@ func TestGetLatestCurrency(t *testing.T) {
 
 	// 1. Setup router
 	r := mux.NewRouter()
-	r.HandleFunc("/currency/latest", APP.GetLatestCurrency).Methods("POST")
+	r.HandleFunc("/currency/latest/", APP.GetLatestCurrency).Methods("POST")
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	url := ts.URL + "/currency/latest"
+	url := ts.URL + "/currency/latest/"
 	t.Log("Testing", url)
 
 	// @TODO - change the POST request to a GET request
@@ -90,6 +78,7 @@ func TestGetLatestCurrency(t *testing.T) {
 	for postBody, wantedStatus := range table {
 		byteBody, _ := json.Marshal(postBody)
 		t.Run(string(byteBody), func(t *testing.T) {
+
 			resp, err := http.Post(url, "application/json", bytes.NewReader(byteBody))
 			if err != nil {
 				t.Fatal(err)

@@ -27,7 +27,7 @@ func (app *App) GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 
 	var reqBody types.CurrencyIn
 
-	err := json.NewDecoder(r.Body).Decode(reqBody)
+	err := json.NewDecoder(r.Body).Decode(&reqBody)
 	if err != nil {
 		httperror.BadRequest(w, "json.NewDecoder.Decode()", fmt.Errorf("Malformed body"))
 		return

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -26,7 +25,7 @@ func init() {
 			Name:    os.Getenv("MONGODB_NAME"),
 			URI:     os.Getenv("MONGODB_URI"),
 			Session: nil,
-		}
+		},
 	}
 
 	// 3. Default values if empty environment
@@ -46,6 +45,6 @@ func init() {
 
 func main() {
 	router := mux.NewRouter().StrictSlash(false)
-	router.HandleFunc("/currency/latest", APP.GetLatestCurrency).Methods("POST")
+	router.HandleFunc("/currency/latest/", APP.GetLatestCurrency).Methods("POST")
 	log.Println(http.ListenAndServe(":"+APP.Port, router))
 }
