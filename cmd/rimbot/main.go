@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/cloudrimmers/imt2681-assignment3/lib/dialogFlow"
+	"github.com/cloudrimmers/imt2681-assignment3/lib/validate"
 	"github.com/gorilla/mux"
 )
 
@@ -30,16 +31,23 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(code)
 		return
 	}
-	test := fmt.Sprintf("Response got:\n%v\t%v\t%v", base, target, amount)
-
-	//Here goes validation of base, target, and amount.
-
-	//Here goes communication with Currencyservice.
 
 	slackTo := struct {
 		Text     string `json:"text"`
 		Username string `json:"username,omitempty"`
-	}{test, "Rimbot"}
+	}{}
+
+	errBase := validate.Currency(base)
+	errTarget := validate.Currency(base)
+	if errBase == nil && errTarget == nil && amount >= 0 { //If valid input for currencyservice.
+
+		slackTo.Text = fmt.Sprintf("Response got:\n base: %v\ttarget: %v\tamount: %v", base, target, amount) //Temporary outprint
+		//Here goes communication with Currencyservice.
+
+	} else { //If invalid input for currencyservice.
+		slackTo.Text = fmt.Sprint("Sorry, I missed that. Maybe something was vague with what you said?\n",
+			"Try using capital letters like this: 'USD', 'GBP'. And numbers like this: '131.5'")
+	}
 
 	outgoing, err := json.Marshal(slackTo)
 	if err != nil {
