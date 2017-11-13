@@ -1,1 +1,2 @@
-web: rimbot
+web: currencyservice
+clock: fixerworker
