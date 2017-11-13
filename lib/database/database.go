@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/Arxcis/imt2681-assignment2/lib/validate"
+	"github.com/cloudrimmers/imt2681-assignment3/lib/validate"
 	"gopkg.in/mgo.v2"
 )
 
@@ -20,7 +20,7 @@ type Mongo struct {
 // Open ...
 func (mongo *Mongo) Open() (*mgo.Database, error) {
 
-	validate.URI()
+	validate.URI(mongo.URI)
 
 	mongo.Session, err = mgo.Dial(mongo.URI)
 
