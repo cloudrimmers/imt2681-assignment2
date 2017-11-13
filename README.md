@@ -5,7 +5,7 @@
 |-----|----|
 | Jonas J. Solsvik | 473193 |
 | Halvor | |
-| Jone | |
+| Jone | 473181 |
 
 
 ### Project executeables (eventually docker containers)
