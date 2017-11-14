@@ -13,8 +13,6 @@ import "gopkg.in/mgo.v2/bson"
 		.....
 		"ZAR":16.14
     }
-}
- See example in config/fixer.json
 */
 type FixerIn struct {
 	ID        bson.ObjectId      `json:"id" bson:"_id,omitempty"`
