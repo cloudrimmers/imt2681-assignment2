@@ -8,16 +8,20 @@ import (
 
 	"github.com/cloudrimmers/imt2681-assignment3/cmd/currencyservice/app"
 	"github.com/cloudrimmers/imt2681-assignment3/lib/database"
+	"github.com/cloudrimmers/imt2681-assignment3/lib/environment"
 
 	"github.com/gorilla/mux"
 )
 
 // APP - global state pbject
 var APP *app.App
+var err error
 
 func init() {
-	const VERBOSE = true
-	const SEED = true
+	// 1. Load environment
+	if err = environment.Load(os.Args); err != nil {
+		panic(err.Error())
+	}
 
 	APP = &app.App{
 		Port:                os.Getenv("PORT"),
@@ -37,11 +41,10 @@ func init() {
 		APP.Mongo.Name = "test"
 	}
 
-	if VERBOSE {
-		indented, _ := json.MarshalIndent(APP, "", "    ")
-		log.Println("App data: ", string(indented))
-	}
+	indented, _ := json.MarshalIndent(APP, "", "    ")
+	log.Println("App data: ", string(indented))
 
+	const SEED = true
 	if SEED {
 		_ = APP.SeedTestDB()
 	}

@@ -13,7 +13,6 @@ var (
 	envDocker            = "docker"
 	envHeroku            = "heroku"
 	envLocal             = "local"
-	testFlag             = "test.v"
 	errorInvalidArgument = fmt.Errorf("ERROR Invalid command-line argument")
 	errorInvalidPath     = fmt.Errorf("ERROR Invalid envpath")
 )

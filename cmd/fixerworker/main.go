@@ -19,6 +19,7 @@ var APP *app.App
 var err error
 
 func init() {
+	// 1. Load environment
 	if err = environment.Load(os.Args); err != nil {
 		panic(err.Error())
 	}

@@ -6,12 +6,20 @@ import (
 	"os"
 
 	"github.com/cloudrimmers/imt2681-assignment3/cmd/rimbot/app"
+	"github.com/cloudrimmers/imt2681-assignment3/lib/environment"
 	"github.com/gorilla/mux"
 )
 
 const root = "/rimbot/"
 
 var err error
+
+func init() {
+	// 1. Load environment
+	if err = environment.Load(os.Args); err != nil {
+		panic(err.Error())
+	}
+}
 
 func main() {
 	r := mux.NewRouter()
