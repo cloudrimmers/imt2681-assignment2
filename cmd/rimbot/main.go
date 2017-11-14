@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os"
 
@@ -16,6 +17,6 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc(root, app.Rimbot).Methods(http.MethodPost)
 	http.Handle("/", r)
-
-	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
+	log.Println("RIMPORT: ", os.Getenv("RIMPORT"))
+	http.ListenAndServe(":"+os.Getenv("RIMPORT"), nil)
 }

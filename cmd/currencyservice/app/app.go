@@ -24,6 +24,7 @@ var err error
 
 // GetLatestCurrency ...
 func (app *App) GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
+	defer log.Println("POST /currency/latest", w.Header().Get("status"))
 
 	var reqBody types.CurrencyIn
 
@@ -68,8 +69,6 @@ func (app *App) GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 	// 4. Respond
 	fmt.Fprintf(w, "%.2f", fixer.Rates[reqBody.TargetCurrency])
 
-	fmt.Fprintf(w, "Here is the latest currency")
-	log.Println("POST /currency/latest", w.Header().Get("status"))
 }
 
 // SeedTestDB ...
