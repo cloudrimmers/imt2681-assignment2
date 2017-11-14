@@ -52,5 +52,6 @@ func init() {
 func main() {
 	router := mux.NewRouter().StrictSlash(false)
 	router.HandleFunc("/currency/latest/", APP.GetLatestCurrency).Methods("POST")
+	log.Println("PORT: ", os.Getenv("PORT"))
 	log.Println(http.ListenAndServe(":"+APP.Port, router))
 }

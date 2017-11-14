@@ -3,7 +3,6 @@ package dialogFlow
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -104,7 +103,7 @@ const (
 
 type requester func(req *http.Request) (resp *http.Response, err error)
 
-func doQuery(queryText string, mock requester) (base string, target string, amount float64, statusCode int) {
+func doQuery(queryText string, rq requester) (base string, target string, amount float64, statusCode int) {
 	responseObject := Response{} //prepare responseObject
 
 	query := newQuery(queryText)
@@ -114,7 +113,6 @@ func doQuery(queryText string, mock requester) (base string, target string, amou
 		statusCode = http.StatusInternalServerError
 		return
 	}
-	fmt.Printf("%+v\n", encodedQuery) //Print the body that will be sent to DialigFlow.
 
 	//Construct a request with our query object
 	req, err := http.NewRequest(
@@ -131,7 +129,8 @@ func doQuery(queryText string, mock requester) (base string, target string, amou
 	req.Header.Add("Authorization", "Bearer "+os.Getenv("ACCESS_TOKEN"))
 	req.Header.Add("Content-Type", "application/json")
 
-	response, err := mock(req) //Execute request.
+	log.Printf("%+v", req)
+	response, err := rq(req) //Execute request.
 	if err != nil {
 		statusCode = http.StatusFailedDependency //NOTE: is this right? - yes it is!
 		return
@@ -142,7 +141,6 @@ func doQuery(queryText string, mock requester) (base string, target string, amou
 		statusCode = http.StatusInternalServerError
 		return
 	}
-
 	err = json.Unmarshal(respBody, &responseObject)
 	if err != nil {
 		log.Println(err)
@@ -150,10 +148,11 @@ func doQuery(queryText string, mock requester) (base string, target string, amou
 		statusCode = http.StatusPartialContent
 		return
 	}
+	log.Printf("%+v", responseObject)
 	// DANGER!!! - someone
 	if responseObject.SessionID != query.SessionID {
 		statusCode = http.StatusUnauthorized
-		responseObject = Response{}
+		// responseObject = Response{}
 		return
 	}
 	base = responseObject.Result.Parameters.CurrencyIn.CurrencyName
