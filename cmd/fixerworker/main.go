@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/cloudrimmers/imt2681-assignment3/lib/environment"
+
 	"github.com/cloudrimmers/imt2681-assignment3/cmd/fixerworker/app"
 	"github.com/cloudrimmers/imt2681-assignment3/lib/database"
 
@@ -17,9 +19,9 @@ var APP *app.App
 var err error
 
 func init() {
-	// @note These 3 bools should probably be command-line arguments - Jonas 13.11.17
-	const SEED = true
-	const VERBOSE = true
+	if err = environment.Load(os.Args); err != nil {
+		panic(err.Error())
+	}
 
 	// 2. Initialize the app object
 	APP = &app.App{
@@ -33,25 +35,21 @@ func init() {
 	}
 
 	// 3. Default values if empty environment
-	if APP.Mongo.URI == "" {
-		APP.Mongo.URI = "mongodb://localhost"
-		APP.Mongo.Name = "test"
-		log.Println("No .env present. Using default values")
-	}
 
 	// 4. Ensure index to avoid duplicates
 	APP.Mongo.EnsureIndex(APP.CollectionFixerName, []string{"date"})
 
 	// 5. Optional seed and log app object
+	const SEED = true
 	if SEED {
 		APP.SeedFixerdata()
 		log.Println("Seeded database")
 	}
-	if VERBOSE {
-		indented, _ := json.MarshalIndent(APP, "", "    ")
-		log.Println("App data: ", string(indented))
-	}
+	// 6. Print finished object
+	indented, _ := json.MarshalIndent(APP, "", "    ")
+	log.Println("App data: ", string(indented))
 
+	// 7. Success
 	log.Println("Fixerworker initialized...")
 }
 
