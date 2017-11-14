@@ -11,8 +11,9 @@ import (
 	"strconv"
 )
 
-// query - Queries to DialogFlow use this kind of body
-type query struct {
+// query - Queries to DialogFlow use this kind of body:
+type query struct { //The required fields are listed in the DialogFlow docs here: https://dialogflow.com/docs/reference/agent/query
+	Language  string   `json:"lang"` // If they change the required fields, it might cause DialogFlow to respond with BadRequest.
 	Query     string   `json:"query"`
 	Contexts  []string `json:"contexts,omitempty"` //may be omitted, context may be implicit
 	SessionID string   `json:"sessionId"`
@@ -21,6 +22,7 @@ type query struct {
 // Generate query object to send into dialogFlow
 func newQuery(text string, contexts ...string) *query {
 	qry := new(query)
+	qry.Language = "en" //Required by Dialog flow since 14-11-17 :/
 	qry.Query = text
 	qry.Contexts = contexts
 	qry.SessionID = generateSessionID()
