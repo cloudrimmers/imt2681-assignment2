@@ -10,4 +10,10 @@
 |GET /latest  |  Query: base, target | text | 1.55 | 
  
 
-  
+# .env file example
+```
+PORT=5000
+ENVIRONMENT=local
+MONGODB_NAME=assignment3
+MONGODB_URI=mongodb://localhost
+```
