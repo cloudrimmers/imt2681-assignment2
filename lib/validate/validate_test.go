@@ -41,12 +41,13 @@ func TestURI(t *testing.T) {
 
 func TestCurrencies(t *testing.T) {
 
-	table := map[string]bool{
+	table := map[string]bool{ //Bool determines rather the test is suppose to fail.
 		"NOK":    true,
 		"EUR":    true,
 		"blalba": false,
 		"_dsfdf": false,
 		"kok":    false,
+		"":       false,
 	}
 
 	for cur, want := range table {

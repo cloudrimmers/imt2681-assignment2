@@ -1,3 +1,8 @@
+##  14.11.17
+- Dockerfile reference - https://docs.docker.com/engine/reference/builder/
+- Docker-compose - https://docs.docker.com/compose/
+- Docker build - https://docs.docker.com/engine/reference/commandline/build/
+
 ## 09.11.17
 - table driven tests ++ https://github.com/gorilla/mux/issues/167
 

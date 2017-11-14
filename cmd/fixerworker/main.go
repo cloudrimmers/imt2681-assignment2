@@ -30,7 +30,6 @@ func init() {
 			URI:     os.Getenv("MONGODB_URI"),
 			Session: nil,
 		},
-		Seedpath: "./config/fixer.json",
 	}
 
 	// 3. Default values if empty environment

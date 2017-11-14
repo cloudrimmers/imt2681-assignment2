@@ -57,6 +57,10 @@
 			"path": "gopkg.in/mgo.v2/internal/scram",
 			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
 			"revisionTime": "2016-08-18T02:01:20Z"
+		},
+		{
+			"path": "vendor/vendor.json",
+			"revision": ""
 		}
 	],
 	"rootPath": "github.com/cloudrimmers/imt2681-assignment3"

@@ -1,4 +1,6 @@
-## Assignment 3 - imt2681 Cloud Programming
+## Assignment 3 - imt2681 Cloud Programming 
+
+*!!UNDER CONSTRUCTION!! - 14.11.17*
 
 ### Participants
 | Name | Studentno |
@@ -88,7 +90,45 @@ snap install heroku
 snap install docker
 ```
 
-### High level system overview
+### Directory structure
+```yml
+root:
+  cmd:
+    currencyservice:
+      app:
+        - app.go
+        - app_test.go
+
+      - main.go
+      - Dockerfile
+      - .env
+
+    fixerclock:
+      app:
+        - app.go
+        - app_test.go
+
+      - main.go
+      - Dockerfile
+      - .env
+    
+    rimbot:
+      app:
+        - app.go
+        - app_test.go
+      
+      - main.go
+      - Dockerfile
+      - .env
+
+  vendor:
+    - vendor.json
+
+  - .dockerignore
+  - .gitignore
+  - docker-compose.yml
+
+```
 
 
 
