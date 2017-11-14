@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strconv"
 	"testing"
+
+	"github.com/cloudrimmers/imt2681-assignment3/lib/validate"
 )
 
 const dialogFlowSampleFile = "./testData/dialogFlowSample.json"
@@ -58,11 +60,16 @@ func TestNewQuery(t *testing.T) {
 	//Teardown
 }
 
+type queryRequesterGen struct {
+	qry string
+	rq  requester
+}
+
 func TestQuery(t *testing.T) {
 
-	parser := func(in, out string, amount float64) (qry string, rq requester) {
-		qry = fmt.Sprintf("%v %v to %v", amount, in, out)
-		rq = func(req *http.Request) (resp *http.Response, err error) {
+	parser := func(in, out string, amount float64) (gen queryRequesterGen) {
+		gen.qry = fmt.Sprintf("%v %v to %v", amount, in, out)
+		gen.rq = func(req *http.Request) (resp *http.Response, err error) {
 			resp = &http.Response{}
 			resp.StatusCode = http.StatusOK
 			resp.Header = http.Header{}
@@ -74,8 +81,14 @@ func TestQuery(t *testing.T) {
 			responseData := Response{}
 			json.Unmarshal(data, &responseData)
 			responseData.Query = fmt.Sprintf("%v %v to %v", amount, in, out)
-			responseData.Result.Parameters.CurrencyIn.CurrencyName = in
-			responseData.Result.Parameters.CurrencyOut.CurrencyName = out
+			err = validate.Currency(in)
+			if err == nil {
+				responseData.Result.Parameters.CurrencyIn.CurrencyName = in
+			}
+			err = validate.Currency(out)
+			if err == nil {
+				responseData.Result.Parameters.CurrencyIn.CurrencyName = out
+			}
 			responseData.Result.Parameters.Amount = amount
 			raw, err := json.Marshal(responseData)
 			if err != nil {
@@ -86,21 +99,18 @@ func TestQuery(t *testing.T) {
 		}
 		return
 	}
-	// type generator
-	// tests := []struct {
-	// 	name string
-	// 	gen  struct {
-	// 		qry string
-	// 		rq  requester
-	// 	}
-	// }{
-	// 	// {"Test 1", parser("Nok", "GBP", 23.56)},
-	// 	// {"Test 2", parser("Nok", "GBP", 23.56)},
-	// 	// {"Test 3", parser("Nok", "GBP", 23.56)},
-	// }
-	//
-	// for test := range tests {
-	//
-	// }
-	doQuery(parser("NOK", "USD", 34.543))
+	tests := []struct {
+		Name      string
+		Generator queryRequesterGen
+	}{
+		{"Test 1", parser("Nok", "GBP", 23.56)},
+		{"Test 2", parser("GBHK", "GBP", 23.56)},
+		{"Test 3", parser("Nok", "GBP", 23.56)},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			doQuery(test.Generator.qry, test.Generator.rq)
+		})
+	}
 }
