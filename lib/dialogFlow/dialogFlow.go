@@ -103,7 +103,7 @@ const (
 
 type requester func(req *http.Request) (resp *http.Response, err error)
 
-func doQuery(queryText string, mock requester) (base string, target string, amount float64, statusCode int) {
+func doQuery(queryText string, rq requester) (base string, target string, amount float64, statusCode int) {
 	responseObject := Response{} //prepare responseObject
 
 	query := newQuery(queryText)
@@ -130,7 +130,7 @@ func doQuery(queryText string, mock requester) (base string, target string, amou
 	req.Header.Add("Content-Type", "application/json")
 
 	log.Printf("%+v", req)
-	response, err := mock(req) //Execute request.
+	response, err := rq(req) //Execute request.
 	if err != nil {
 		statusCode = http.StatusFailedDependency //NOTE: is this right? - yes it is!
 		return
