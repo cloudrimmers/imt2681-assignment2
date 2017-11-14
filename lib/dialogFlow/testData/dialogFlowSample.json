@@ -1,0 +1,42 @@
+{
+  "id": "cc21e643-0a61-412c-bb18-3d366fbff0bd",
+  "timestamp": "2017-11-13T21:22:06.955Z",
+  "lang": "en",
+  "result": {
+    "source": "agent",
+    "resolvedQuery": "Convert 20 Nok to ¥",
+    "action": "convert",
+    "actionIncomplete": false,
+    "parameters": {
+      "amount": 20,
+      "currency-in": {
+        "currency-name": "NOK"
+      },
+      "currency-out": {
+        "currency-name": "CNY"
+      }
+    },
+    "contexts": [],
+    "metadata": {
+      "intentId": "0123783b-f742-4269-9a7b-c9068b66d133",
+      "webhookUsed": "false",
+      "webhookForSlotFillingUsed": "false",
+      "intentName": "convert currency"
+    },
+    "fulfillment": {
+      "speech": "",
+      "messages": [
+        {
+          "type": 0,
+          "speech": ""
+        }
+      ]
+    },
+    "score": 1
+  },
+  "status": {
+    "code": 200,
+    "errorType": "success"
+  },
+  "sessionId": "5b7a82ba-16cc-4e78-abb8-7794f4820817"
+}

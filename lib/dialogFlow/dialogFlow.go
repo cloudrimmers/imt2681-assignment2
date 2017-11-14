@@ -100,8 +100,9 @@ const (
 	ProtocolNumeric = 20170712
 )
 
-//Query DialogFlow for a conversion
-func Query(queryText string) (base string, target string, amount float64, statusCode int) {
+type requester func(req *http.Request) (resp *http.Response, err error)
+
+func doQuery(queryText string, mock requester) (base string, target string, amount float64, statusCode int) {
 	responseObject := Response{} //prepare responseObject
 
 	query := newQuery(queryText)
@@ -128,7 +129,7 @@ func Query(queryText string) (base string, target string, amount float64, status
 	req.Header.Add("Authorization", "Bearer "+os.Getenv("ACCESS_TOKEN"))
 	req.Header.Add("Content-Type", "application/json")
 
-	response, err := http.DefaultClient.Do(req) //Execute request.
+	response, err := mock(req) //Execute request.
 	if err != nil {
 		statusCode = http.StatusFailedDependency //NOTE: is this right? - yes it is!
 		return
@@ -159,4 +160,9 @@ func Query(queryText string) (base string, target string, amount float64, status
 
 	statusCode = responseObject.Status.Code
 	return
+}
+
+//Query DialogFlow for a conversion
+func Query(queryText string) (base string, target string, amount float64, statusCode int) {
+	return doQuery(queryText, http.DefaultClient.Do)
 }
