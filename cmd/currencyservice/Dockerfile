@@ -4,7 +4,7 @@ LABEL maintainer="jonasjso@stud.ntnu.com"
 RUN apt-get update && apt-get -y upgrade
 
 # Copy and install code
-COPY ../../. /code
+COPY $GOPATH/ /code
 WORKDIR /code
 RUN ./script/install.sh
 
