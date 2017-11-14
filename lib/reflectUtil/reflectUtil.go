@@ -5,11 +5,22 @@ import (
 	"runtime"
 )
 
+// REFERENCE: https://stackoverflow.com/questions/35212985/is-it-possible-get-information-about-caller-function-in-golang
+
+//GetCallerName - returns the name of the function the used
 func GetCallerName() string {
+	return getCallerName(3)
+}
+
+func GetCallerNameInTest() string {
+	return getCallerName(2)
+}
+
+func getCallerName(depth int) string {
 	fpcs := make([]uintptr, 1)
 
-	// skip 3 levels to get to the caller of whoever called Caller()
-	n := runtime.Callers(3, fpcs)
+	// skip 2 levels to get to the caller of whoever called Caller()
+	n := runtime.Callers(depth, fpcs)
 	if n == 0 {
 		return "" // proper error her would be better
 	}

@@ -152,7 +152,7 @@ func doQuery(queryText string, rq requester) (base string, target string, amount
 	// DANGER!!! - someone
 	if responseObject.SessionID != query.SessionID {
 		statusCode = http.StatusUnauthorized
-		// responseObject = Response{}
+		responseObject = Response{}
 		return
 	}
 	base = responseObject.Result.Parameters.CurrencyIn.CurrencyName
