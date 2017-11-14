@@ -8,7 +8,9 @@ import (
 	"net/http"
 	"strconv"
 	"testing"
+	"time"
 
+	"github.com/cloudrimmers/imt2681-assignment3/lib/benchmark"
 	"github.com/cloudrimmers/imt2681-assignment3/lib/validate"
 )
 
@@ -67,6 +69,7 @@ type queryRequesterGen struct {
 
 func TestQuery(t *testing.T) {
 
+	defer benchmark.Benchmark(time.Now())
 	parser := func(in, out string, amount float64) (gen queryRequesterGen) {
 		gen.qry = fmt.Sprintf("%v %v to %v", amount, in, out)
 		gen.rq = func(req *http.Request) (resp *http.Response, err error) {
