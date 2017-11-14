@@ -2,7 +2,6 @@ package app
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
@@ -17,7 +16,6 @@ type App struct {
 	FixerioURI          string
 	CollectionFixerName string
 	Mongo               database.Mongo
-	Seedpath            string
 }
 
 var err error
@@ -71,18 +69,7 @@ func (app *App) Fixer2Mongo(response *types.FixerIn) error {
 func (app *App) SeedFixerdata() {
 
 	// 0. Get seed
-	seed := func() []types.FixerIn {
-		log.Println("Reading " + app.Seedpath)
-		data, err := ioutil.ReadFile(app.Seedpath)
-		if err != nil {
-			panic(err.Error())
-		}
-		var fixerin []types.FixerIn
-		if err = json.Unmarshal(data, &fixerin); err != nil {
-			panic(err.Error())
-		}
-		return fixerin
-	}()
+	seed := types.FixerSeed
 
 	// 1. Open collection
 	collectionFixer, err := app.Mongo.OpenC(app.CollectionFixerName)

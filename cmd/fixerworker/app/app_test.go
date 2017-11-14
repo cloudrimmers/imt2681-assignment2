@@ -25,7 +25,6 @@ func init() {
 			URI:     "mongodb://localhost",
 			Session: nil,
 		},
-		Seedpath: "../../../config/fixer.json",
 	}
 
 	// 4. Ensure index to avoid duplicates
