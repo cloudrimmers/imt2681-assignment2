@@ -1,16 +1,41 @@
 #!/bin/sh
 
-currencyservice_run(){
+#
+# RIMBOT | DOCKER BUILD AND RUN
+#
+rimbot_run(){
 	echo
-	echo Running docker container of currencyservice:latest ...
+	echo Running docker image of rimbot:latest ...
 	echo
 	docker run -it \
 			   --rm \
-			   -p 127.0.0.1:5001:5001 \
+			   -p :5000:5000 \
+			   --name rimbot \
+			   --env-file cmd/rimbot/.env \
+			   rimbot:latest
+}
+
+rimbot_build(){
+	echo 
+	echo  Building docker image of rimbot:latest ..
+	echo
+	docker build --tag rimbot:latest \
+			     --file ./cmd/rimbot/Dockerfile \
+		         .
+}
+
+#
+# CURRENCYSERVICE | DOCKER BUILD AND RUN
+#
+currencyservice_run(){
+	echo
+	echo Running docker image of currencyservice:latest ...
+	echo
+	docker run -it \
+			   --rm \
+			   -p :5001:5001 \
 			   --name currencyservice \
 			   --env-file cmd/currencyservice/.env \
-			   --link db \
-			   --env MONGODB_URI=db \
 			   currencyservice:latest
 }
 
@@ -18,12 +43,39 @@ currencyservice_build(){
 	echo 
 	echo  Building docker image of currencyservice:latest ..
 	echo
-	$(govendor sync)
 	docker build --tag currencyservice:latest \
 			     --file ./cmd/currencyservice/Dockerfile \
 		         .
 }
 
+#
+# FIXERWORKER | DOCKER BUILD AND RUN
+#
+fixerworker_run(){
+	echo
+	echo Running docker image of fixerworker:latest ...
+	echo
+	docker run -it \
+			   --rm \
+			   -p :5002:5002 \
+			   --name fixerworker \
+			   --env-file cmd/fixerworker/.env \
+			   fixerworker:latest
+}
+
+fixerworker_build(){
+	echo 
+	echo  Building docker image of fixerworker:latest ..
+	echo
+	docker build --tag fixerworker:latest \
+			     --file ./cmd/fixerworker/Dockerfile \
+		         .
+}
+
+
+#
+# MONGO | DOCKER RUN
+#
 mongo_run() {
 	echo
 	echo Running docker image of mongo:latest ...
@@ -31,6 +83,7 @@ mongo_run() {
 	docker run -it \
 			   --rm \
 			   --name db \
+			   -p :27017:27017 \
 		       --mount source=dbdata,target=/data/db \
 			   mongo:latest
 }
@@ -56,11 +109,22 @@ case $1 in
 	"csrun")
 		currencyservice_run
   		;;
-
 	"csbuild")
   		currencyservice_build
   		;;
-  	"mgorun")
+  	"fwrun")
+		fixerworker_run
+  		;;
+	"fwbuild")
+  		fixerworker_build
+  		;;
+  	"rbrun")
+		rimbot_run
+  		;;
+	"rbbuild")
+  		rimbot_build
+  		;;
+  	"mgrun")
 		mongo_run
 		;;
   	"rmall")

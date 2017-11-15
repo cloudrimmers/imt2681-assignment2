@@ -35,22 +35,12 @@ func init() {
 		},
 	}
 
-	// 3. Default values if empty environment
-
-	// 4. Ensure index to avoid duplicates
+	APP.SeedFixerdata()
 	APP.Mongo.EnsureIndex(APP.CollectionFixerName, []string{"date"})
 
-	// 5. Optional seed and log app object
-	const SEED = true
-	if SEED {
-		APP.SeedFixerdata()
-		log.Println("Seeded database")
-	}
-	// 6. Print finished object
 	indented, _ := json.MarshalIndent(APP, "", "    ")
 	log.Println("App data: ", string(indented))
 
-	// 7. Success
 	log.Println("Fixerworker initialized...")
 }
 

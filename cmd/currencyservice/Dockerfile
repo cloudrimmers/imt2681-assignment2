@@ -5,10 +5,9 @@ ENV PROJECT_ROOT=$GOPATH/src/github.com/cloudrimmers/imt2681-assignment3
 COPY . $PROJECT_ROOT
 WORKDIR $PROJECT_ROOT
 
-RUN ./script/install.sh
+RUN go install -v ./cmd/currencyservice
 
 EXPOSE 5001
 # Run code
 
 CMD ["currencyservice", "docker"]
-

@@ -51,6 +51,7 @@ func init() {
 
 	log.Println("TEST currencyservice initialized...")
 }
+
 func TestGetLatestCurrency(t *testing.T) {
 
 	// 1. Setup router

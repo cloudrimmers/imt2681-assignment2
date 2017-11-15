@@ -33,21 +33,8 @@ func init() {
 		},
 	}
 
-	// 3. Default values if empty environment
-	if APP.Mongo.URI == "" {
-		log.Println("No .env present. Using default values")
-		APP.Port = "5000"
-		APP.Mongo.URI = "mongodb://localhost"
-		APP.Mongo.Name = "test"
-	}
-
 	indented, _ := json.MarshalIndent(APP, "", "    ")
 	log.Println("App data: ", string(indented))
-
-	const SEED = true
-	if SEED {
-		_ = APP.SeedTestDB()
-	}
 
 	log.Println("Currencyservice initialized...")
 }
