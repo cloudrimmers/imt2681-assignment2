@@ -13,12 +13,7 @@ services:
     depends_on: 
       - currencyservice
     ports: 
-      - "5000:5000"
-    
-    deploy:
-      restart_policy:
-        condition: on-failure
-        max_attempts: 10
+      - "5000:5000"  
   #
   # 2. CURRENCYSERVICE  
   #
@@ -34,12 +29,7 @@ services:
     expose:
       - "5001"
     depends_on: 
-      - mongo
-    
-    deploy:
-      restart_policy:
-        condition: on-failure
-        max_attempts: 10        
+      - mongo  
   #
   # 3. FIXERWORKER 
   #
@@ -55,12 +45,7 @@ services:
     expose:
       - "5002"
     depends_on: 
-      - mongo
-    
-    deploy:
-      restart_policy:
-        condition: on-failure
-        max_attempts: 10        
+      - mongo  
   #
   # 4. MONGO 
   #
@@ -72,16 +57,6 @@ services:
 
     expose:
       - "27017"
-
-    deploy:
-      restart_policy:
-        condition: on-failure
-        max_attempts: 10        
-
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "tcp://192.168.0.42:123"
         
 volumes:
   dbdata:
