@@ -7,14 +7,12 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
 	"github.com/gorilla/mux"
 
 	"github.com/cloudrimmers/imt2681-assignment3/lib/database"
 	"github.com/cloudrimmers/imt2681-assignment3/lib/types"
-	"github.com/subosito/gotenv"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -23,32 +21,16 @@ var testid bson.ObjectId
 
 func init() {
 
-	const envpath = "../../../.env"
-
-	// 1. Require .env to be present
-	log.Println("Reading .env")
-	gotenv.MustLoad(envpath)
-
 	APP = &App{
 		Port:                "5555",
 		CollectionFixerName: "testfixer",
 		Mongo: database.Mongo{
-			URI:     os.Getenv("MONGODB_URI"),
-			Name:    os.Getenv("MONGODB_NAME"),
+			URI:     "mongodb://localhost",
+			Name:    "test",
 			Session: nil,
 		},
 	}
-
-	// 3. Default values if empty environment
-	if APP.Mongo.URI == "" {
-		log.Println("No .env present. Using default values")
-		APP.Mongo.URI = "mongodb://localhost"
-		APP.Mongo.Name = "test"
-	}
-
-	log.Println("Seeding DB")
-	APP.SeedTestDB()
-
+	APP.SeedFixerdata()
 	log.Println("TEST currencyservice initialized...")
 }
 

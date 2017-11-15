@@ -70,3 +70,29 @@ func (app *App) GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%.2f", fixer.Rates[reqBody.TargetCurrency])
 
 }
+
+// SeedFixerdata ...
+// @TODO This is a duplicate of an identical function in fixerworker/ 
+//   	  Maybe this should be put in a library - JSolsvik 15.11.17
+func (app *App) SeedFixerdata() {
+
+	// 0. Get seed
+	seed := types.FixerSeed
+
+	// 1. Open collection
+	collectionFixer, err := app.Mongo.OpenC(app.CollectionFixerName)
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+	defer app.Mongo.Close()
+	collectionFixer.DropCollection()
+
+	// 2. Insert to database
+	// cfixer.DropCollection()
+	for _, o := range seed {
+		if err = collectionFixer.Insert(o); err != nil {
+			log.Println("Unable to db.Insert seed")
+		}
+	}
+}

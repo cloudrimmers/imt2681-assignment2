@@ -19,7 +19,6 @@ var APP *app.App
 var err error
 
 func init() {
-	// 1. Load environment
 	if err = environment.Load(os.Args); err != nil {
 		panic(err.Error())
 	}
@@ -40,7 +39,6 @@ func init() {
 
 	indented, _ := json.MarshalIndent(APP, "", "    ")
 	log.Println("App data: ", string(indented))
-
 	log.Println("Fixerworker initialized...")
 }
 
@@ -49,13 +47,14 @@ func main() {
 	targetWait := -(timetool.UntilTomorrow())
 	ticker := time.NewTicker(time.Minute)
 
-	log.Println("T wait  : ", targetWait.String())
+	log.Println("clock: ", targetWait.String())
 	for _ = range ticker.C {
 		targetWait += time.Minute
-		log.Println("T wait  : ", targetWait.String())
+		log.Println("clock: ", targetWait.String())
 
 		if targetWait >= 0 {
 			targetWait = -(timetool.UntilTomorrow())
+
 			response, err := APP.FixerResponse(APP.FixerioURI)
 
 			if err != nil {
