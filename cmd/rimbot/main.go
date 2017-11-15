@@ -25,6 +25,6 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc(root, app.Rimbot).Methods(http.MethodPost)
 	http.Handle("/", r)
-	log.Println("RIMPORT: ", os.Getenv("RIMPORT"))
-	http.ListenAndServe(":"+os.Getenv("RIMPORT"), nil)
+	log.Println("PORT: ", os.Getenv("PORT"))
+	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 }

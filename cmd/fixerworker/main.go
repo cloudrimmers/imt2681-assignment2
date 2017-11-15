@@ -19,7 +19,6 @@ var APP *app.App
 var err error
 
 func init() {
-	// 1. Load environment
 	if err = environment.Load(os.Args); err != nil {
 		panic(err.Error())
 	}
@@ -35,22 +34,11 @@ func init() {
 		},
 	}
 
-	// 3. Default values if empty environment
-
-	// 4. Ensure index to avoid duplicates
+	APP.SeedFixerdata()
 	APP.Mongo.EnsureIndex(APP.CollectionFixerName, []string{"date"})
 
-	// 5. Optional seed and log app object
-	const SEED = true
-	if SEED {
-		APP.SeedFixerdata()
-		log.Println("Seeded database")
-	}
-	// 6. Print finished object
 	indented, _ := json.MarshalIndent(APP, "", "    ")
 	log.Println("App data: ", string(indented))
-
-	// 7. Success
 	log.Println("Fixerworker initialized...")
 }
 
@@ -59,13 +47,14 @@ func main() {
 	targetWait := -(timetool.UntilTomorrow())
 	ticker := time.NewTicker(time.Minute)
 
-	log.Println("T wait  : ", targetWait.String())
+	log.Println("clock: ", targetWait.String())
 	for _ = range ticker.C {
 		targetWait += time.Minute
-		log.Println("T wait  : ", targetWait.String())
+		log.Println("clock: ", targetWait.String())
 
 		if targetWait >= 0 {
 			targetWait = -(timetool.UntilTomorrow())
+
 			response, err := APP.FixerResponse(APP.FixerioURI)
 
 			if err != nil {

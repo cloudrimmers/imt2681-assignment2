@@ -19,21 +19,25 @@ var (
 
 // Load ...
 func Load(arg []string) error {
-
+	debugprint := func(envname string, envpath string) {
+		log.Println("env name: ", envname)
+		log.Println("envpath:  ", envpath)
+	}
 	_, fn, _, _ := runtime.Caller(1)
 	envpath := filepath.Join(filepath.Dir(fn), ".env")
-	log.Println("env: ", arg[1], "\nenvpath: ", envpath)
 
 	switch arg[1] {
 	case envDocker:
-		break
+		debugprint(arg[1], "using existing environment")
 	case envHeroku:
-		break
+		debugprint(arg[1], "using existing environment")
 	case envLocal:
+		debugprint(arg[1], envpath)
 		if err := gotenv.Load(envpath); err != nil {
 			return errorInvalidPath
 		}
 	default:
+		debugprint(arg[1], "wrong env name")
 		return errorInvalidArgument
 	}
 

@@ -66,6 +66,8 @@ func (app *App) Fixer2Mongo(response *types.FixerIn) error {
 }
 
 // SeedFixerdata ...
+// @TODO This is a duplicate of an identical function in fixerworker/ 
+//   	  Maybe this should be put in a library - JSolsvik 15.11.17
 func (app *App) SeedFixerdata() {
 
 	// 0. Get seed

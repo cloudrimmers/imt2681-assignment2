@@ -1,3 +1,6 @@
+## 15.11.17
+- Totally static go bulds - http://blog.wrouesnel.com/articles/Totally%20static%20Go%20builds/
+
 ##  14.11.17
 - Dockerfile reference - https://docs.docker.com/engine/reference/builder/
 - Docker-compose - https://docs.docker.com/compose/

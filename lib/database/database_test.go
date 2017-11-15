@@ -2,18 +2,12 @@ package database
 
 import (
 	"fmt"
-	"os"
 	"testing"
-
-	"github.com/subosito/gotenv"
 )
 
-var mongoURI string
+const mongoURI = "mongodb://localhost"
 
-func init() {
-	gotenv.MustLoad("../../.env")
-	mongoURI = os.Getenv("MONGODB_URI")
-}
+
 func TestOpen(t *testing.T) {
 
 	mongo := Mongo{Name: "test", URI: mongoURI, Session: nil}

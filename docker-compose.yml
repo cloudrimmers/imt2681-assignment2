@@ -1,44 +1,62 @@
 version: '3'
 services:
-
+  #
   # 1. RIMBOT
+  #
   rimbot:
     build: 
       context: .
       dockerfile: ./cmd/rimbot/Dockerfile
+    
     env_file: ./cmd/rimbot/.env
+    
     depends_on: 
       - currencyservice
-    port: 
-      - "8080:8080"
-
+    ports: 
+      - "5000:5000"  
+  #
   # 2. CURRENCYSERVICE  
+  #
   currencyservice:
     build:
       context: .
       dockerfile: ./cmd/currencyservice/Dockerfile
+    
     env_file: ./cmd/currencyservice/.env
+    environment:
+      MONGODB_URI: mongo
+    
+    expose:
+      - "5001"
     depends_on: 
-      - mongo
-    expose: 
-      - "8081"
-
+      - mongo  
+  #
   # 3. FIXERWORKER 
+  #
   fixerworker:
     build: 
       context: .
       dockerfile: ./cmd/fixerworker/Dockerfile
+    
     env_file: ./cmd/fixerworker/.env
+    environment:
+      MONGODB_URI: mongo
+    
+    expose:
+      - "5002"
     depends_on: 
-      - mongo
-
+      - mongo  
+  #
   # 4. MONGO 
+  #
   mongo:
     image: mongo:latest
-    expose: 
-      - "27017"
-    volume:
+
+    volumes:
       - dbdata:/data/db
 
+    expose:
+      - "27017"
+        
 volumes:
   dbdata:

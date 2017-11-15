@@ -1,13 +1,10 @@
 FROM golang:1.9.2-stretch
 
-RUN apt-get update && apt-get -y upgrade
+# RUN apt-get update && apt-get -y upgrade
+ENV PROJECT_ROOT=$GOPATH/src/github.com/cloudrimmers/imt2681-assignment3
+COPY . $PROJECT_ROOT
+WORKDIR $PROJECT_ROOT
 
-# Install dependencies
-RUN go get github.com/gorilla/mux \
-    go get github.com/subosito/gotenv \
-    go get gopkg.in/mgo.v2 \
-    go get github.com/cloudrimmers/imt2681-assignment3
+RUN go install -v ./cmd/fixerworker
 
-# Run code
-WORKDIR $GOPATH
-CMD ["./bin/fixerworker"]
+CMD ["fixerworker", "docker"]
