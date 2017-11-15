@@ -10,4 +10,4 @@ RUN go get github.com/gorilla/mux \
 
 # Run code
 WORKDIR $GOPATH
-CMD ["./bin/rimbot"]
+CMD ["./bin/fixerworker"]

@@ -5,4 +5,4 @@ RUN apt-get update && apt-get -y upgrade
 
 # Run code
 WORKDIR $GOPATH
-CMD ["./bin/rimbot"]
+CMD ["./bin/currencyservice"]

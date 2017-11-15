@@ -8,5 +8,4 @@ The bot is the link between:
 # .env file example
 ```
 PORT=5000
-ENVIRONMENT=local
 ```

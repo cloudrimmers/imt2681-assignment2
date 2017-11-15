@@ -83,7 +83,7 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 
 			req, err := http.NewRequest(
 				http.MethodPost,
-				"http://127.0.0.1:5000/currency/latest/",
+				"https://currency-trackr.herokuapp.com/api/latest/", //TODO CHANGE THIS
 				ioutil.NopCloser(body),
 			)
 

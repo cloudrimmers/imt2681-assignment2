@@ -1,19 +1,18 @@
 ## Description
 
-### Currencyservice 
+### Currencyservice
 - A RestAPI service providing currency convertion rates.
 
 ### End-points
 
-| URL  | Params | Return type | Return example | 
+| URL  | Params | Return type | Return example |
 |-----| ------| ------- | ------- |
-|GET /latest  |  Query: base, target | text | 1.55 | 
- 
+|GET /latest  |  Query: base, target | text | 1.55 |
+
 
 # .env file example
 ```
 PORT=5000
-ENVIRONMENT=local
 MONGODB_NAME=assignment3
 MONGODB_URI=mongodb://localhost
 ```
