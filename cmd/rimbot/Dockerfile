@@ -7,4 +7,6 @@ WORKDIR $PROJECT_ROOT
 
 RUN go install -v ./cmd/rimbot
 
+EXPOSE 5000
+
 CMD ["rimbot", "docker"]

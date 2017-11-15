@@ -1,77 +1,32 @@
 #!/bin/sh
 
 #
-# RIMBOT | DOCKER BUILD AND RUN
+# DOCKER RUN AND BUILD
 #
-rimbot_run(){
+docker_run(){
+	name=$1
+	port=$2
 	echo
-	echo Running docker image of rimbot:latest ...
+	echo Running docker image of $name:latest ...
 	echo
 	docker run -it \
 			   --rm \
-			   -p :5000:5000 \
-			   --name rimbot \
-			   --env-file cmd/rimbot/.env \
-			   rimbot:latest
+			   -p :$port:$port \
+			   --name $name \
+			   --env-file cmd/$name/.env \
+			   --env PORT=$port	\
+			   $name:latest
 }
 
-rimbot_build(){
+docker_build(){
+	name=$1
 	echo 
-	echo  Building docker image of rimbot:latest ..
+	echo  Building docker image of $name:latest ..
 	echo
-	docker build --tag rimbot:latest \
-			     --file ./cmd/rimbot/Dockerfile \
+	docker build --tag $name:latest \
+			     --file ./cmd/$name/Dockerfile \
 		         .
 }
-
-#
-# CURRENCYSERVICE | DOCKER BUILD AND RUN
-#
-currencyservice_run(){
-	echo
-	echo Running docker image of currencyservice:latest ...
-	echo
-	docker run -it \
-			   --rm \
-			   -p :5001:5001 \
-			   --name currencyservice \
-			   --env-file cmd/currencyservice/.env \
-			   currencyservice:latest
-}
-
-currencyservice_build(){
-	echo 
-	echo  Building docker image of currencyservice:latest ..
-	echo
-	docker build --tag currencyservice:latest \
-			     --file ./cmd/currencyservice/Dockerfile \
-		         .
-}
-
-#
-# FIXERWORKER | DOCKER BUILD AND RUN
-#
-fixerworker_run(){
-	echo
-	echo Running docker image of fixerworker:latest ...
-	echo
-	docker run -it \
-			   --rm \
-			   -p :5002:5002 \
-			   --name fixerworker \
-			   --env-file cmd/fixerworker/.env \
-			   fixerworker:latest
-}
-
-fixerworker_build(){
-	echo 
-	echo  Building docker image of fixerworker:latest ..
-	echo
-	docker build --tag fixerworker:latest \
-			     --file ./cmd/fixerworker/Dockerfile \
-		         .
-}
-
 
 #
 # MONGO | DOCKER RUN
@@ -107,22 +62,22 @@ clean_images() {
 # echo ARGS: $1 $2 $3
 case $1 in
 	"csrun")
-		currencyservice_run
+		docker_run currencyservice 5001
   		;;
 	"csbuild")
-  		currencyservice_build
+		docker_build currencyservice
   		;;
   	"fwrun")
-		fixerworker_run
+		docker_run fixerworker 5002
   		;;
 	"fwbuild")
-  		fixerworker_build
+		docker_build fixerworker 5002
   		;;
   	"rbrun")
-		rimbot_run
+		docker_run rimbot 5000	  
   		;;
 	"rbbuild")
-  		rimbot_build
+  		docker_build rimbot 5000
   		;;
   	"mgrun")
 		mongo_run
