@@ -6,7 +6,7 @@
 | Name | Studentno |
 |-----|----|
 | Jonas J. Solsvik | 473193 |
-| Halvor | |
+| Halvor B. Smedås | 473196 |
 | Jone | 473181 |
 
 
