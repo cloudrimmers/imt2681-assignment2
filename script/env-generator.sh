@@ -1,16 +1,17 @@
 #!/bin/sh
 
 # $1 = PORT Rimbot
-# $2 = PORT Currencyservice
-# $3 = DBNAME
-# $4 = DBURI
+# $2 = ACCESS_TOKEN (Clara)
+# $3 = PORT Currencyservice
+# $4 = DBNAME
+# $5 = DBURI
 
 #
 # rimbot/.env
 #
 WORKFILE=./cmd/rimbot/.env
 touch $WORKFILE
-env="PORT=$1\n"
+env="PORT=$1\nACCESS_TOKEN=$2"
 echo $env > $WORKFILE
 
 
@@ -19,7 +20,7 @@ echo $env > $WORKFILE
 #
 WORKFILE=./cmd/currencyservice/.env
 touch $WORKFILE
-env="PORT=$2\nMONGODB_NAME=$3\nMONGODB_URI=$4\n" 
+env="PORT=$3\nMONGODB_NAME=$4\nMONGODB_URI=$5\n"
 echo $env > $WORKFILE
 
 #
@@ -27,5 +28,5 @@ echo $env > $WORKFILE
 #
 WORKFILE=./cmd/fixerworker/.env
 touch $WORKFILE
-env="MONGODB_NAME=$3\nMONGODB_URI=$4\n"
+env="MONGODB_NAME=$4\nMONGODB_URI=$5\n"
 echo $env > $WORKFILE
