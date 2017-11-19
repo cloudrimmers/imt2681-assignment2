@@ -15,11 +15,13 @@ import (
 
 var err error
 
-func messageSlack(w http.ResponseWriter, msg string) {
+const slackUserError = "Sorry, I missed that. Maybe something was vague with what you said? Try using capital letters like this: 'USD', 'GBP'. And numbers like this: '131.5'"
+const BotDefaultName = "Rimbot"
+
+func MessageSlack(msg string) []byte {
 
 	if msg == "" {
-		msg = fmt.Sprint("Sorry, I missed that. Maybe something was vague with what you said?\n",
-			"Try using capital letters like this: 'USD', 'GBP'. And numbers like this: '131.5'")
+		msg = slackUserError
 	}
 
 	slackTo := struct {
@@ -27,14 +29,15 @@ func messageSlack(w http.ResponseWriter, msg string) {
 		Username string `json:"username,omitempty"`
 	}{
 		msg,
-		"RimBot",
+		BotDefaultName,
+	}
+	var body []byte
+	body, err = json.Marshal(slackTo)
+	if err != nil {
+		body = []byte(strconv.Itoa(http.StatusInternalServerError))
 	}
 
-	outgoing, err := json.Marshal(slackTo)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-	w.Write(outgoing)
+	return body
 }
 
 //Rimbot - TODO
@@ -62,7 +65,7 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(code)
 		return
 	} else if code == http.StatusPartialContent { //If Unmarshal fails in Query(). Meaning Clara got confused.
-		messageSlack(w, "")
+		w.Write(MessageSlack("")) //You fuced up.
 	} else { //If everything got parsed correctly.
 		errBase := validate.Currency(base)
 		errTarget := validate.Currency(target)
@@ -77,7 +80,7 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 			body := new(bytes.Buffer)
 			err = json.NewEncoder(body).Encode(currencyTo)
 			if err != nil {
-				messageSlack(w, "Encoding fail")
+				w.Write(MessageSlack(""))
 				return
 			}
 
@@ -91,33 +94,33 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 
 			resp, err := http.DefaultClient.Do(req)
 			if err != nil {
-				messageSlack(w, "Post fail")
+				w.Write(MessageSlack(""))
 				return
 			}
 
 			// resp, err := http.Post("127.0.0.1:"+os.Getenv("PORT")+"/currency/latest/", "application/json", body)
 			// log.Println(body)
 			// if err != nil {
-			// 	messageSlack(w, "Post fail")
+			// 	MessageSlack(w, "Post fail")
 			// 	return
 			// }
 
 			log.Println("respBody: ", resp)
 			unParsedRate, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
-				messageSlack(w, "read body fail")
+				w.Write(MessageSlack(""))
 				return
 			}
 			parsedRate, err := strconv.ParseFloat(string(unParsedRate), 64)
 			if err != nil {
-				messageSlack(w, "parse fail")
+				w.Write(MessageSlack(""))
 				return
 			}
 			convertedRate := amount * parsedRate
-			messageSlack(w, fmt.Sprintf("%v %v is equal to %v %v. ^^", amount, base, convertedRate, target)) //Temporary outprint
+			w.Write(MessageSlack(fmt.Sprintf("%v %v is equal to %v %v. ^^", amount, base, convertedRate, target))) //Temporary outprint
 
 		} else { //If invalid input for currencyservice.
-			messageSlack(w, "")
+			w.Write(MessageSlack("")) //You fucked up.
 			return
 		}
 	}
