@@ -45,8 +45,9 @@ func (app *App) GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 1.6 If two equals currencies, just return 1 == 1 conversion rate
 	if reqBody.BaseCurrency == reqBody.TargetCurrency {
-		httperror.BadRequest(w, "basecurrency==targetcurrency", fmt.Errorf("Base currency cannot be equal target currency"))
+		fmt.Fprintf(w, "1.0")
 		return
 	}
 
