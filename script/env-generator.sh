@@ -11,7 +11,7 @@
 #
 WORKFILE=./cmd/rimbot/.env
 touch $WORKFILE
-env="PORT=$1\nACCESS_TOKEN=$2"
+env="PORT=$1\nACCESS_TOKEN=$2\n"
 echo $env > $WORKFILE
 
 
@@ -30,3 +30,17 @@ WORKFILE=./cmd/fixerworker/.env
 touch $WORKFILE
 env="MONGODB_NAME=$4\nMONGODB_URI=$5\n"
 echo $env > $WORKFILE
+
+
+
+#
+# Confidentely cat stuff
+#
+echo "\n------- rimbot .env --------------"
+cat ./cmd/rimbot/.env
+
+echo "------- currencyservice .env -----"
+cat ./cmd/currencyservice/.env
+
+echo "------- fixerworker .env ---------"
+cat ./cmd/fixerworker/.env
