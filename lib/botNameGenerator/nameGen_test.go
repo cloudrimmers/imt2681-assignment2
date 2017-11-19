@@ -7,7 +7,7 @@ import (
 
 func TestGenerate(t *testing.T) {
 
-	name := Generate()
+	name := Generate() // Generate new name.
 
 	parts := strings.Split(name, " ")
 
