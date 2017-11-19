@@ -25,6 +25,9 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc(root, app.Rimbot).Methods(http.MethodPost)
 	http.Handle("/", r)
-	log.Println("PORT: ", os.Getenv("PORT"))
+	log.Println("PORT:           ", os.Getenv("PORT"))
+	log.Println("ACCESS_TOKEN:   ", os.Getenv("ACCESS_TOKEN"))
+	log.Println("CURRENCY_URI:   ", os.Getenv("CURRENCY_URI"))
+
 	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 }
