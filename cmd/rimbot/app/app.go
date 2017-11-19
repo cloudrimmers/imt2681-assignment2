@@ -140,12 +140,12 @@ type ConversionResponse struct {
 		//NOTE: If need be, place ADDITIONAL PARAMETERS
 		Parameters struct {
 			CurrencyOut struct {
-				CurrencyName string `json:"currency-name,omitempty"`
+				CurrencyName string `json:"currency-name"`
 			} `json:"currency-out"`
 			CurrencyIn struct {
-				CurrencyName string `json:"currency-name,omitempty"`
+				CurrencyName string `json:"currency-name"`
 			} `json:"currency-in"`
-			Amount string `json:"amount,omitempty"`
+			Amount string `json:"amount"`
 		} `json:"parameters"`
 	} `json:"result"`
 	SessionID string `json:"sessionId"`
@@ -158,11 +158,18 @@ func (r *ConversionResponse) GetSessionID() string {
 func QueryCurrencyConversion(text string) (base, target string, amount float64, code int) {
 	result := ConversionResponse{}
 	code = dialogFlow.Query(text, &result, os.Getenv("ACCESS_TOKEN"))
+
 	base = result.Result.Parameters.CurrencyIn.CurrencyName
 	target = result.Result.Parameters.CurrencyOut.CurrencyName
-	amount, err = strconv.ParseFloat(result.Result.Parameters.Amount, 64)
+	unparsedAmount := result.Result.Parameters.Amount
+	if base == "" || target == "" || unparsedAmount == "" {
+		code = http.StatusPartialContent
+		amount = 0
+		return
+	}
+	amount, err = strconv.ParseFloat(unparsedAmount, 64)
 	if err != nil {
-		panic(err)
+		code = http.StatusPartialContent
 	}
 	return
 }
