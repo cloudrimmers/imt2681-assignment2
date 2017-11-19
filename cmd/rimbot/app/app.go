@@ -41,7 +41,6 @@ func MessageSlack(msg string) []byte {
 }
 
 func ParseFixerResponse(body io.ReadCloser) (parsedRate float64, localErr error) {
-	//var localErr error
 
 	unParsedRate, localErr := ioutil.ReadAll(body) // Read all data from request body.
 	if localErr != nil {
@@ -69,6 +68,15 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("text sent to query: ", form.Get("text")) //Print text from form in terminal.
 	//convert webhook values into new outgoing message
+
+	/* Query system will soo t\be changed to this convention:
+	    func()(base, target, amount, code)...
+		  //new response struct
+		  // query(&response)
+		  result.parameters.cr
+	*/
+	// base, target, amount, code := func()
+
 	base, target, amount, code := dialogFlow.Query(form.Get("text")) //Gets values from DialogFlow.
 
 	log.Println("DialogFlow query output(in rimbot): ", base, "\t", target, "\t", amount, "\t", code)
@@ -106,14 +114,14 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 
 			resp, err := http.DefaultClient.Do(req) // Sends request to currencyservice and revieves response.
 			if err != nil {
-				w.Write(MessageSlack(""))
+				w.Write(MessageSlack("")) //They fucked up.
 				return
 			}
 
 			log.Println("respBody: ", resp)
 			parsedRate, err := ParseFixerResponse(resp.Body)
 			if err != nil {
-				w.Write(MessageSlack(""))
+				w.Write(MessageSlack("")) //We fucked up.
 				return
 			}
 
