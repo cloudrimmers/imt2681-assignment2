@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/cloudrimmers/imt2681-assignment3/lib/botNameGenerator"
@@ -75,15 +76,7 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 	log.Println("text sent to query: ", form.Get("text")) //Print text from form in terminal.
 	//convert webhook values into new outgoing message
 
-	/* Query system will soo t\be changed to this convention:
-	    func()(base, target, amount, code)...
-		  //new response struct
-		  // query(&response)
-		  result.parameters.cr
-	*/
-	// base, target, amount, code := func()
-
-	base, target, amount, code := dialogFlow.Query(form.Get("text")) //Gets values from DialogFlow.
+	base, target, amount, code := QueryCurrencyConversion(form.Get("text"))
 
 	log.Println("DialogFlow query output(in rimbot): ", base, "\t", target, "\t", amount, "\t", code)
 
@@ -112,7 +105,7 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 
 			req, err := http.NewRequest( //Starts to construct a request.
 				http.MethodPost,
-				"https://currency-trackr.herokuapp.com/api/latest/", //TODO CHANGE THIS
+				"https://shrouded-journey-80451.herokuapp.com/currency/latest/",
 				ioutil.NopCloser(body),
 			)
 
@@ -139,4 +132,37 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+}
+
+// Response - A representation of the response from DialogFlow
+type ConversionResponse struct {
+	Result struct {
+		//NOTE: If need be, place ADDITIONAL PARAMETERS
+		Parameters struct {
+			CurrencyOut struct {
+				CurrencyName string `json:"currency-name,omitempty"`
+			} `json:"currency-out"`
+			CurrencyIn struct {
+				CurrencyName string `json:"currency-name,omitempty"`
+			} `json:"currency-in"`
+			Amount string `json:"amount,omitempty"`
+		} `json:"parameters"`
+	} `json:"result"`
+	SessionID string `json:"sessionId"`
+}
+
+func (r *ConversionResponse) GetSessionID() string {
+	return r.SessionID
+}
+
+func QueryCurrencyConversion(text string) (base, target string, amount float64, code int) {
+	result := ConversionResponse{}
+	code = dialogFlow.Query(text, &result, os.Getenv("ACCESS_TOKEN"))
+	base = result.Result.Parameters.CurrencyIn.CurrencyName
+	target = result.Result.Parameters.CurrencyOut.CurrencyName
+	amount, err = strconv.ParseFloat(result.Result.Parameters.Amount, 64)
+	if err != nil {
+		panic(err)
+	}
+	return
 }
