@@ -23,7 +23,6 @@ func MessageSlack(msg string) []byte {
 	if msg == "" {
 		msg = slackUserError
 	}
-
 	slackTo := struct {
 		Text     string `json:"text"`
 		Username string `json:"username,omitempty"`
@@ -46,18 +45,16 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("Content-Type", "application/json")
 
-	//obtain slacks' webhook
-
-	err = r.ParseForm()
+	err = r.ParseForm() //Parse from containing content of message from user.
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	form := r.Form
 
-	log.Println("text sent to query: ", form.Get("text"))
+	log.Println("text sent to query: ", form.Get("text")) //Print text from form in terminal.
 	//convert webhook values into new outgoing message
-	base, target, amount, code := dialogFlow.Query(form.Get("text"))
+	base, target, amount, code := dialogFlow.Query(form.Get("text")) //Gets values from DialogFlow.
 
 	log.Println("DialogFlow query output(in rimbot): ", base, "\t", target, "\t", amount, "\t", code)
 
@@ -72,19 +69,19 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 
 		if errBase == nil && errTarget == nil && amount >= 0 { //If valid input for currencyservice.
 
-			currencyTo := map[string]string{
+			currencyTo := map[string]string{ // Request payload to currencyservice.
 				"baseCurrency":   base,
 				"targetCurrency": target,
 			}
 
-			body := new(bytes.Buffer)
+			body := new(bytes.Buffer) // Encode request payload to json:
 			err = json.NewEncoder(body).Encode(currencyTo)
-			if err != nil {
+			if err != nil { // Since values was validated, it "should" be impossible for this to fail.
 				w.Write(MessageSlack(""))
 				return
 			}
 
-			req, err := http.NewRequest(
+			req, err := http.NewRequest( //Starts to construct a request.
 				http.MethodPost,
 				"https://currency-trackr.herokuapp.com/api/latest/", //TODO CHANGE THIS
 				ioutil.NopCloser(body),
@@ -92,26 +89,19 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 
 			log.Printf("Request: %+v", req)
 
-			resp, err := http.DefaultClient.Do(req)
+			resp, err := http.DefaultClient.Do(req) // Sends request to currencyservice and revieves response.
 			if err != nil {
 				w.Write(MessageSlack(""))
 				return
 			}
-
-			// resp, err := http.Post("127.0.0.1:"+os.Getenv("PORT")+"/currency/latest/", "application/json", body)
-			// log.Println(body)
-			// if err != nil {
-			// 	MessageSlack(w, "Post fail")
-			// 	return
-			// }
 
 			log.Println("respBody: ", resp)
-			unParsedRate, err := ioutil.ReadAll(resp.Body)
+			unParsedRate, err := ioutil.ReadAll(resp.Body) // Read all data from request body.
 			if err != nil {
 				w.Write(MessageSlack(""))
 				return
 			}
-			parsedRate, err := strconv.ParseFloat(string(unParsedRate), 64)
+			parsedRate, err := strconv.ParseFloat(string(unParsedRate), 64) // Parse "rate" float from response body.
 			if err != nil {
 				w.Write(MessageSlack(""))
 				return
