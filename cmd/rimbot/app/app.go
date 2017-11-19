@@ -105,7 +105,7 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 
 			req, err := http.NewRequest( //Starts to construct a request.
 				http.MethodPost,
-				"https://currency-trackr.herokuapp.com/api/latest/", //TODO CHANGE THIS
+				"https://shrouded-journey-80451.herokuapp.com/currency/latest/",
 				ioutil.NopCloser(body),
 			)
 
