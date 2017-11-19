@@ -14,7 +14,7 @@ func TestMessageSlack(t *testing.T) {
 	var expected string
 
 	input = ""
-	output = MessageSlack(input)
+	output = MessageSlack(input, false)
 	expected = "{\"text\":\"" + slackUserError + "\",\"username\":\"" + BotDefaultName + "\"}"
 	if string(output) != expected {
 
@@ -22,7 +22,7 @@ func TestMessageSlack(t *testing.T) {
 	}
 
 	input = "Test string 123"
-	output = MessageSlack(input)
+	output = MessageSlack(input, false)
 	expected = "{\"text\":\"" + input + "\",\"username\":\"" + BotDefaultName + "\"}"
 	if string(output) != expected {
 
@@ -30,7 +30,7 @@ func TestMessageSlack(t *testing.T) {
 	}
 
 	input = " "
-	output = MessageSlack(input)
+	output = MessageSlack(input, false)
 	expected = "{\"text\":\"" + input + "\",\"username\":\"" + BotDefaultName + "\"}"
 	if string(output) != expected {
 

@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/cloudrimmers/imt2681-assignment3/lib/botNameGenerator"
 	"github.com/cloudrimmers/imt2681-assignment3/lib/dialogFlow"
 	"github.com/cloudrimmers/imt2681-assignment3/lib/validate"
 )
@@ -19,7 +20,7 @@ var err error
 const slackUserError = "Sorry, I missed that. Maybe something was vague with what you said? Try using capital letters like this: 'USD', 'GBP'. And numbers like this: '131.5'"
 const BotDefaultName = "Rimbot"
 
-func MessageSlack(msg string) []byte {
+func MessageSlack(msg string, generateBotName bool) []byte {
 
 	if msg == "" {
 		msg = slackUserError
@@ -30,6 +31,11 @@ func MessageSlack(msg string) []byte {
 	}{
 		msg,
 		BotDefaultName,
+	}
+
+	if generateBotName {
+
+		slackTo.Username = botNameGenerator.Generate()
 	}
 	var body []byte
 	body, err = json.Marshal(slackTo)
@@ -85,7 +91,7 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(code)
 		return
 	} else if code == http.StatusPartialContent { //If Unmarshal fails in Query(). Meaning Clara got confused.
-		w.Write(MessageSlack("")) //You fuced up.
+		w.Write(MessageSlack("", true)) //You fuced up.
 	} else { //If everything got parsed correctly.
 		errBase := validate.Currency(base)
 		errTarget := validate.Currency(target)
@@ -100,7 +106,7 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 			body := new(bytes.Buffer) // Encode request payload to json:
 			err = json.NewEncoder(body).Encode(currencyTo)
 			if err != nil { // Since values was validated, it "should" be impossible for this to fail.
-				w.Write(MessageSlack(""))
+				w.Write(MessageSlack("", true))
 				return
 			}
 
@@ -114,22 +120,22 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 
 			resp, err := http.DefaultClient.Do(req) // Sends request to currencyservice and revieves response.
 			if err != nil {
-				w.Write(MessageSlack("")) //They fucked up.
+				w.Write(MessageSlack("", true)) //They fucked up.
 				return
 			}
 
 			log.Println("respBody: ", resp)
 			parsedRate, err := ParseFixerResponse(resp.Body)
 			if err != nil {
-				w.Write(MessageSlack("")) //We fucked up.
+				w.Write(MessageSlack("", true)) //We fucked up.
 				return
 			}
 
 			convertedRate := amount * parsedRate
-			w.Write(MessageSlack(fmt.Sprintf("%v %v is equal to %v %v. ^^", amount, base, convertedRate, target))) //Temporary outprint
+			w.Write(MessageSlack(fmt.Sprintf("%v %v is equal to %v %v. ^^", amount, base, convertedRate, target), true)) //Temporary outprint
 
 		} else { //If invalid input for currencyservice.
-			w.Write(MessageSlack("")) //You fucked up.
+			w.Write(MessageSlack("", true)) //You fucked up.
 			return
 		}
 	}
