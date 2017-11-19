@@ -106,6 +106,8 @@ func doQuery(qry *query, rq requester, result QueryOut, token string) (statusCod
 		return
 	}
 
+	//TODO: check resolved action from dialogflow
+
 	err = json.Unmarshal(respBody, &result) // NOTE: err might be ignored at this point
 	if err != nil {
 		log.Println(err)
