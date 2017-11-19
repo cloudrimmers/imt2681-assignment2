@@ -7,7 +7,6 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"os"
 	"strconv"
 )
 
@@ -33,82 +32,33 @@ func generateSessionID() string {
 	return strconv.Itoa(rand.Intn(10000))
 }
 
-/*
-{
-    "id": "a41ed389-151b-415c-ae34-b5093435a5ce",
-    "timestamp": "2017-11-13T12:15:01.323Z",
-    "lang": "en",
-    "result": {
-        "source": "agent",
-        "resolvedQuery": "Convert 500 NOK to EUR",
-        "speech": "",
-        "action": "convert",
-        "parameters": {
-            "currency-out": [
-                "EUR"
-            ],
-            "unit-currency-in": {
-                "amount": 500,
-                "currency": "NOK"
-            }
-        },
-        "metadata": {
-            "inputContexts": [],
-            "outputContexts": [],
-            "intentName": "convert currency",
-            "intentId": "0123783b-f742-4269-9a7b-c9068b66d133",
-            "webhookUsed": "false",
-            "webhookForSlotFillingUsed": "false",
-            "contexts": []
-        },
-        "score": 1
-    },
-    "status": {
-        "code": 200,
-        "errorType": "success"
-    },
-    "sessionId": "Bois"
-}
-*/
-
-// Response - A representation of the response from DialogFlow
-type Response struct {
-	Query  string `json:"query"`
-	Result struct {
-		//NOTE: If need be, place ADDITIONAL PARAMETERS
-		Parameters struct {
-			CurrencyOut struct {
-				CurrencyName string `json:"currency-name,omitempty"`
-			} `json:"currency-out"`
-			CurrencyIn struct {
-				CurrencyName string `json:"currency-name,omitempty"`
-			} `json:"currency-in"`
-			Amount float64 `json:"amount,omitempty"`
-		} `json:"parameters"`
-	} `json:"result"`
-	Status struct {
-		Code  int    `json:"code"`
-		Error string `json:"errorType"`
-	} `json:"status"`
-	SessionID string `json:"sessionId"`
+//QueryOut - Generalized result of a query
+type QueryOut interface {
+	GetSessionID() string
 }
 
-const dialogFlowRoot = "https://api.dialogflow.com/v1/query?v=" ////NOTE: protocol number is "required", consider adding it
+type status struct {
+	Code         int    `json:"code"`
+	Error        string `json:"errorType"`
+	ErrorDetails string `json:"errorDetails, omitempty"`
+}
+type queryStatus struct {
+	*status `json:"status"`
+}
+
+const dialogFlowRoot = "https://api.dialogflow.com/v1/query?v=" //NOTE: protocol number is "required", consider adding it
 
 // Protocols: https://dialogflow.com/docs/reference/agent/#protocol_version
 const (
 	ProtocolBase    = 20150910
-	ProtocolNumeric = 20170712
+	ProtocolNumeric = 20170712 //NOTE we'll not take use of the numeric protocol as it's inconsistent when taking use of DialogFlows default values
+	// Specifically 'amount' of type @sys.number is not sent as a number in the json-body when set through default values, but rather a string.
 )
 
 type requester func(req *http.Request) (resp *http.Response, err error)
 
-func doQuery(queryText string, rq requester) (base string, target string, amount float64, statusCode int) {
-	responseObject := Response{} //prepare responseObject
-
-	query := newQuery(queryText)
-
-	encodedQuery, err := json.Marshal(query)
+func doQuery(qry *query, rq requester, result QueryOut, token string) (statusCode int) {
+	encodedQuery, err := json.Marshal(qry)
 	if err != nil {
 		statusCode = http.StatusInternalServerError
 		return
@@ -117,7 +67,7 @@ func doQuery(queryText string, rq requester) (base string, target string, amount
 	//Construct a request with our query object
 	req, err := http.NewRequest(
 		http.MethodPost,
-		dialogFlowRoot+strconv.Itoa(ProtocolNumeric),
+		dialogFlowRoot+strconv.Itoa(ProtocolBase),
 		ioutil.NopCloser(bytes.NewBuffer(encodedQuery)),
 	)
 	if err != nil {
@@ -126,7 +76,7 @@ func doQuery(queryText string, rq requester) (base string, target string, amount
 	}
 
 	//Add authorization token to head. Identifies agent in dialogflow.
-	req.Header.Add("Authorization", "Bearer "+os.Getenv("ACCESS_TOKEN"))
+	req.Header.Add("Authorization", "Bearer "+token)
 	req.Header.Add("Content-Type", "application/json")
 
 	log.Printf("%+v", req)
@@ -141,29 +91,38 @@ func doQuery(queryText string, rq requester) (base string, target string, amount
 		statusCode = http.StatusInternalServerError
 		return
 	}
-	err = json.Unmarshal(respBody, &responseObject)
+
+	qryStatus := queryStatus{}
+
+	err = json.Unmarshal(respBody, &qryStatus)
+	if err != nil {
+		log.Printf("Error:\n%v\nFailed unmarshalling response:\n%+v", err, qryStatus)
+	}
+
+	statusCode = qryStatus.Code
+
+	if qryStatus.Code != http.StatusOK {
+		log.Printf("Dialogflow Error: %+v", qryStatus.status)
+		return
+	}
+
+	err = json.Unmarshal(respBody, &result) // NOTE: err might be ignored at this point
 	if err != nil {
 		log.Println(err)
-		log.Printf("failed unmarshalling response:\n%+v", responseObject)
 		statusCode = http.StatusPartialContent
 		return
 	}
-	log.Printf("%+v", responseObject)
-	// DANGER!!! - someone
-	if responseObject.SessionID != query.SessionID {
+	log.Printf("%+v", result)
+
+	if result.GetSessionID() != qry.SessionID {
 		statusCode = http.StatusUnauthorized
-		responseObject = Response{}
 		return
 	}
-	base = responseObject.Result.Parameters.CurrencyIn.CurrencyName
-	target = responseObject.Result.Parameters.CurrencyOut.CurrencyName
-	amount = responseObject.Result.Parameters.Amount
-
-	statusCode = responseObject.Status.Code
 	return
 }
 
 //Query DialogFlow for a conversion
-func Query(queryText string) (base string, target string, amount float64, statusCode int) {
-	return doQuery(queryText, http.DefaultClient.Do)
+func Query(queryText string, result QueryOut, token string) (statusCode int) {
+	qry := newQuery(queryText)
+	return doQuery(qry, http.DefaultClient.Do, result, token)
 }

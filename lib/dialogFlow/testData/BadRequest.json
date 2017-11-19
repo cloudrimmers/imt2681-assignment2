@@ -1,0 +1,11 @@
+{
+    "id": "1fe82423-51f4-4a51-b788-f9c7419c9f6c",
+    "timestamp": "2017-11-19T17:52:53.128Z",
+    "lang": "en",
+    "status": {
+        "code": 400,
+        "errorType": "bad_request",
+        "errorDetails": "The field 'lang' is required",
+        "webhookTimedOut": false
+    }
+}
