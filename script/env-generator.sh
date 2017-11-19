@@ -5,13 +5,14 @@
 # $3 = PORT Currencyservice
 # $4 = DBNAME
 # $5 = DBURI
+# $6 = CURRENCY_URI
 
 #
 # rimbot/.env
 #
 WORKFILE=./cmd/rimbot/.env
 touch $WORKFILE
-env="PORT=$1\nACCESS_TOKEN=$2\n"
+env="PORT=$1\nACCESS_TOKEN=$2\nCURRENCY_URI=$6"
 echo $env > $WORKFILE
 
 
