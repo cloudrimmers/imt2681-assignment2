@@ -1,0 +1,43 @@
+{
+    "id": "28f6cbae-44fa-4b3d-af3a-5a15e001790d",
+    "timestamp": "2017-11-19T19:48:39.195Z",
+    "lang": "en",
+    "result": {
+        "source": "agent",
+        "resolvedQuery": "convert Nok to KRW",
+        "action": "convert",
+        "actionIncomplete": false,
+        "parameters": {
+            "amount": "1",
+            "currency-in": {
+                "currency-name": "NOK"
+            },
+            "currency-out": {
+                "currency-name": "KRW"
+            }
+        },
+        "contexts": [],
+        "metadata": {
+            "intentId": "0123783b-f742-4269-9a7b-c9068b66d133",
+            "webhookUsed": "false",
+            "webhookForSlotFillingUsed": "false",
+            "intentName": "convert currency"
+        },
+        "fulfillment": {
+            "speech": "",
+            "messages": [
+                {
+                    "type": 0,
+                    "speech": ""
+                }
+            ]
+        },
+        "score": 0.49000000953674316
+    },
+    "status": {
+        "code": 200,
+        "errorType": "success",
+        "webhookTimedOut": false
+    },
+    "sessionId": "1"
+}
