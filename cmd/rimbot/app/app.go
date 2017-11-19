@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -37,6 +38,20 @@ func MessageSlack(msg string) []byte {
 	}
 
 	return body
+}
+
+func ParseFixerResponse(body io.ReadCloser) (parsedRate float64, localErr error) {
+	//var localErr error
+
+	unParsedRate, localErr := ioutil.ReadAll(body) // Read all data from request body.
+	if localErr != nil {
+		return parsedRate, localErr
+	}
+	parsedRate, localErr = strconv.ParseFloat(string(unParsedRate), 64) // Parse "rate" float from response body.
+	if localErr != nil {
+		return parsedRate, localErr
+	}
+	return parsedRate, localErr
 }
 
 //Rimbot - TODO
@@ -96,16 +111,12 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 			}
 
 			log.Println("respBody: ", resp)
-			unParsedRate, err := ioutil.ReadAll(resp.Body) // Read all data from request body.
+			parsedRate, err := ParseFixerResponse(resp.Body)
 			if err != nil {
 				w.Write(MessageSlack(""))
 				return
 			}
-			parsedRate, err := strconv.ParseFloat(string(unParsedRate), 64) // Parse "rate" float from response body.
-			if err != nil {
-				w.Write(MessageSlack(""))
-				return
-			}
+
 			convertedRate := amount * parsedRate
 			w.Write(MessageSlack(fmt.Sprintf("%v %v is equal to %v %v. ^^", amount, base, convertedRate, target))) //Temporary outprint
 
