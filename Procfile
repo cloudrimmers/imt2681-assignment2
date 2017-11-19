@@ -1,2 +1,1 @@
-web: currencyservice
-clock: fixerworker
+web: currencyservice heroku
