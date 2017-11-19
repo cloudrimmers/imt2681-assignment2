@@ -121,7 +121,15 @@ func doQuery(qry *query, rq requester, result QueryOut, token string) (statusCod
 	return
 }
 
-//Query DialogFlow for a conversion
+/*
+Query - Queries a DialogFlow agent with the given token
+Statuses:
+InternalServerError
+FailedDependency
+PartialContent
+OK
+Unauthorized
+*/
 func Query(queryText string, result QueryOut, token string) (statusCode int) {
 	qry := newQuery(queryText)
 	return doQuery(qry, http.DefaultClient.Do, result, token)
