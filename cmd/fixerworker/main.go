@@ -34,7 +34,14 @@ func init() {
 		},
 	}
 
-	APP.SeedFixerdata()
+	// Make sure at least one entry in the database
+	response, err := APP.FixerResponse(APP.FixerioURI)
+	if err != nil {
+		log.Println("ERROR FixerResponse()", err.Error())
+	} else if err = APP.Fixer2Mongo(response); err != nil {
+		log.Println("ERROR Fixer2Mongo()", err.Error())
+	}
+
 	APP.Mongo.EnsureIndex(APP.CollectionFixerName, []string{"date"})
 
 	indented, _ := json.MarshalIndent(APP, "", "    ")
@@ -47,6 +54,7 @@ func main() {
 	targetWait := -(timetool.UntilTomorrow())
 	ticker := time.NewTicker(time.Minute)
 
+	// Start clock loop
 	log.Println("clock: ", targetWait.String())
 	for _ = range ticker.C {
 		targetWait += time.Minute
@@ -58,9 +66,9 @@ func main() {
 			response, err := APP.FixerResponse(APP.FixerioURI)
 
 			if err != nil {
-				log.Println("ERROR FixerResponse()")
+				log.Println("ERROR FixerResponse()", err.Error())
 			} else if err = APP.Fixer2Mongo(response); err != nil {
-				log.Println("ERROR Fixer2Mongo()")
+				log.Println("ERROR Fixer2Mongo()", err.Error())
 			} else {
 				log.Println("SUCCESS pulling fixer.io: ", response)
 			}
