@@ -86,7 +86,7 @@ func (app *App) SeedFixerdata() {
 	// cfixer.DropCollection()
 	for _, o := range seed {
 		if err = collectionFixer.Insert(o); err != nil {
-			log.Println("Unable to db.Insert seed")
+			log.Println("Unable to db.Insert seed", err.Error())
 		}
 	}
 }

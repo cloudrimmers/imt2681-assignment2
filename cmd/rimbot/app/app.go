@@ -134,7 +134,7 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Response - A representation of the response from DialogFlow
+// ConversionResponse - A representation of the resposnse from DialogFlow
 type ConversionResponse struct {
 	Result struct {
 		//NOTE: If need be, place ADDITIONAL PARAMETERS
