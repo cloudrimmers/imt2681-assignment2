@@ -44,9 +44,9 @@ services:
   mongo:
     image: mongo:latest
     expose:
-      - "27017"
+      - "${MONGO_PORT}"
     ports:
-      - "27017:27017"
+      - "${MONGO_PORT}:${MONGO_PORT}"
     volumes:
       - dbdata:/data/db
 

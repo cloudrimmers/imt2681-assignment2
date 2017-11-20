@@ -55,7 +55,8 @@ echo $env > $WORKFILE
 WORKFILE=.env
 env="
 CURRENCY_PORT=$4\n
-RIMBOT_PORT=$2\n"
+RIMBOT_PORT=$2\n
+MONGO_PORT=27017\n"
 echo $env > $WORKFILE
 
 #
