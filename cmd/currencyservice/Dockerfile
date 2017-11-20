@@ -1,4 +1,4 @@
-FROM golang:1.9.2-stretch
+FROM golang:1.9.2-stretch as builder
 
 # RUN apt-get update && apt-get -y upgrade
 ENV PROJECT_ROOT=$GOPATH/src/github.com/cloudrimmers/imt2681-assignment3
@@ -7,6 +7,5 @@ WORKDIR $PROJECT_ROOT
 
 RUN go install -v ./cmd/currencyservice
 
-EXPOSE 5001
 # Run code
 CMD ["currencyservice", "docker"]
