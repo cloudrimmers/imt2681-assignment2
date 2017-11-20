@@ -1,1 +1,1 @@
-web: rimbot local
+web: rimbot heroku
