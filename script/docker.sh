@@ -7,7 +7,7 @@ docker_run(){
 	name=$1
 	port=$2
 	echo
-	echo Running docker image of $name:latest ...
+	echo Running docker image of $name:min ...
 	echo
 	docker run -it \
 			   --rm \
@@ -15,15 +15,15 @@ docker_run(){
 			   --name $name \
 			   --env-file cmd/$name/.env \
 			   --env PORT=$port	\
-			   $name:latest
+			   $name:min
 }
 
 docker_build(){
 	name=$1
 	echo 
-	echo  Building docker image of $name:latest ..
+	echo  Building docker image of $name:min ..
 	echo
-	docker build --tag $name:latest \
+	docker build --tag $name:min \
 			     --file ./cmd/$name/Dockerfile \
 		         .
 }
@@ -71,13 +71,13 @@ case $1 in
 		docker_run fixerworker 5002
   		;;
 	"fwbuild")
-		docker_build fixerworker 5002
+		docker_build fixerworker
   		;;
   	"rbrun")
 		docker_run rimbot 5000	  
   		;;
 	"rbbuild")
-  		docker_build rimbot 5000
+  		docker_build rimbot
   		;;
   	"mgrun")
 		mongo_run
