@@ -23,19 +23,26 @@ var err error
 // FixerResponse ...
 func (app *App) FixerResponse(uri string) (*types.FixerIn, error) {
 	// 1. Connect and request to fixer.io
-	resp, _ := http.Get(uri)
+	resp, err := http.Get(uri)
 	if err != nil {
 		return nil, err
 	}
 
 	// 2. Decode payload
-	responsebody := new(types.FixerIn)
-	err = json.NewDecoder(resp.Body).Decode(&responsebody)
+	//rbody := new(types.FixerIn)
+	rbody := types.FixerIn{}
+
+	log.Println("!! -", &rbody, resp.Body, "-- !!")
+
+	err = json.NewDecoder(resp.Body).Decode(&rbody)
+	
+	log.Println("!! --- !!")
 	if err != nil {
 		return nil, err
 	}
+	log.Println("!! --- !!")
 
-	return responsebody, nil
+	return &rbody, nil
 }
 
 // Fixer2Mongo ...
@@ -48,10 +55,10 @@ func (app *App) Fixer2Mongo(response *types.FixerIn) error {
 
 	// 4. Connect to DB
 	collectionFixer, err := app.Mongo.OpenC(app.CollectionFixerName)
-	defer app.Mongo.Close()
 	if err != nil {
 		return err
 	}
+	defer app.Mongo.Close()
 
 	// 5. Timestamp
 	response.Timestamp = time.Now().String()
@@ -66,7 +73,7 @@ func (app *App) Fixer2Mongo(response *types.FixerIn) error {
 }
 
 // SeedFixerdata ...
-// @TODO This is a duplicate of an identical function in fixerworker/ 
+// @TODO This is a duplicate of an identical function in fixerworker/
 //   	  Maybe this should be put in a library - JSolsvik 15.11.17
 func (app *App) SeedFixerdata() {
 

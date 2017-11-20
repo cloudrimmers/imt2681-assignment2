@@ -34,6 +34,10 @@ func init() {
 		},
 	}
 
+	indented, _ := json.MarshalIndent(APP, "", "    ")
+	log.Println("App data: ", string(indented))
+	APP.Mongo.EnsureIndex(APP.CollectionFixerName, []string{"date"})
+
 	// Make sure at least one entry in the database
 	response, err := APP.FixerResponse(APP.FixerioURI)
 	if err != nil {
@@ -42,10 +46,6 @@ func init() {
 		log.Println("ERROR Fixer2Mongo()", err.Error())
 	}
 
-	APP.Mongo.EnsureIndex(APP.CollectionFixerName, []string{"date"})
-
-	indented, _ := json.MarshalIndent(APP, "", "    ")
-	log.Println("App data: ", string(indented))
 	log.Println("Fixerworker initialized...")
 }
 

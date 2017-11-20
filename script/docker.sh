@@ -7,7 +7,7 @@ docker_run(){
 	name=$1
 	port=$2
 	echo
-	echo Running docker image of $name:min ...
+	echo Running docker image of $name:latest ...
 	echo
 	docker run -it \
 			   --rm \
@@ -15,15 +15,15 @@ docker_run(){
 			   --name $name \
 			   --env-file cmd/$name/.env \
 			   --env PORT=$port	\
-			   $name:min
+			   $name:latest
 }
 
 docker_build(){
 	name=$1
 	echo 
-	echo  Building docker image of $name:min ..
+	echo  Building docker image of $name:latest ..
 	echo
-	docker build --tag $name:min \
+	docker build --tag $name:latest \
 			     --file ./cmd/$name/Dockerfile \
 		         .
 }

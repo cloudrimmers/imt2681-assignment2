@@ -13,15 +13,8 @@ RUN CGO_ENABLED=0 GOOS=linux \
 				 -v \
 				 -o ./bin/fixerworker \
 				 ./cmd/fixerworker
-#
-# 2. SECOND FROM SCRATCH STAGE 
-#
-FROM scratch
 
-ENV PROJECT_ROOT=/go/src/github.com/cloudrimmers/imt2681-assignment3
-WORKDIR /
-COPY --from=builder $PROJECT_ROOT/bin/fixerworker .
-
+RUN cp $PROJECT_ROOT/bin/fixerworker /fixerworker
 
 # Run code
 CMD ["/fixerworker", "docker"]
