@@ -46,9 +46,9 @@ func TestParseFixerResponse(t *testing.T) {
 	var expected float64
 	var err error
 
-	input = ioutil.NopCloser(bytes.NewReader([]byte("3.14")))
+	input = ioutil.NopCloser(bytes.NewReader([]byte("75.01300048828125")))
 	output, err = ParseFixerResponse(input)
-	expected = 3.14
+	expected = 75.01300048828125
 	if err != nil {
 
 		t.Error("Parsing fixer data failed. Got error: ", err)

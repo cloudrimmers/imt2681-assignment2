@@ -45,10 +45,8 @@ func TestGetLatestCurrency(t *testing.T) {
 	url := ts.URL + "/currency/latest/"
 	t.Log("Testing", url)
 
-	// @TODO - change the POST request to a GET request
 	// 2. Define table
 	table := map[types.CurrencyIn]int{
-		//{BaseCurrency: "RAR", TargetCurrency: "NOK"}: http.StatusBadRequest, //@todo - This should be handled as a bad request
 		{BaseCurrency: "AAA", TargetCurrency: "EUR"}: http.StatusBadRequest,
 		{BaseCurrency: "EUR", TargetCurrency: "AAA"}: http.StatusBadRequest,
 		{BaseCurrency: "USD", TargetCurrency: "EUR"}: http.StatusOK,
