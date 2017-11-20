@@ -60,7 +60,6 @@ func ParseFixerResponse(body io.ReadCloser) (parsedRate float64, localErr error)
 	return parsedRate, localErr
 }
 
-//Rimbot - TODO
 func Rimbot(w http.ResponseWriter, r *http.Request) {
 	log.Println("Rimbot invoked.")
 
@@ -80,58 +79,52 @@ func Rimbot(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("DialogFlow query output(in rimbot): ", base, "\t", target, "\t", amount, "\t", code)
 
-	if code != http.StatusOK && code != http.StatusPartialContent {
+	switch code {
+	case http.StatusOK:
+		break
+	case http.StatusPartialContent:
+		w.Write(MessageSlack("", true)) //You fuced up
+		return
+	default:
 		w.WriteHeader(code)
 		return
-	} else if code == http.StatusPartialContent { //If Unmarshal fails in Query(). Meaning Clara got confused.
-		w.Write(MessageSlack("", true)) //You fuced up.
-	} else { //If everything got parsed correctly.
-		errBase := validate.Currency(base)
-		errTarget := validate.Currency(target)
-
-		if errBase == nil && errTarget == nil && amount >= 0 { //If valid input for currencyservice.
-
-			currencyTo := map[string]string{ // Request payload to currencyservice.
-				"baseCurrency":   base,
-				"targetCurrency": target,
-			}
-
-			body := new(bytes.Buffer) // Encode request payload to json:
-			err = json.NewEncoder(body).Encode(currencyTo)
-			if err != nil { // Since values was validated, it "should" be impossible for this to fail.
-				w.Write(MessageSlack("", true))
-				return
-			}
-
-			req, err := http.NewRequest( //Starts to construct a request.
-				http.MethodPost, // Posting to the lastest handler of the service.
-				os.Getenv("CURRENCY_URI")+"currency/latest/",
-				ioutil.NopCloser(body),
-			)
-
-			log.Printf("Request: %+v", req)
-
-			resp, err := http.DefaultClient.Do(req) // Sends request to currencyservice and revieves response.
-			if err != nil {
-				w.Write(MessageSlack("", true)) //They fucked up.
-				return
-			}
-
-			log.Println("respBody: ", resp)
-			parsedRate, err := ParseFixerResponse(resp.Body)
-			if err != nil {
-				w.Write(MessageSlack("", true)) //We fucked up.
-				return
-			}
-
-			convertedRate := amount * parsedRate
-			w.Write(MessageSlack(fmt.Sprintf("%v %v is equal to %v %v. ^^", amount, base, convertedRate, target), true)) //Temporary outprint
-
-		} else { //If invalid input for currencyservice.
-			w.Write(MessageSlack("", true)) //You fucked up.
-			return
-		}
 	}
+	currencyTo := map[string]string{ // Request payload to currencyservice.
+		"baseCurrency":   base,
+		"targetCurrency": target,
+	}
+
+	body := new(bytes.Buffer) // Encode request payload to json:
+	err = json.NewEncoder(body).Encode(currencyTo)
+	if err != nil { // Since values was validated, it "should" be impossible for this to fail.
+		w.Write(MessageSlack("", true))
+		return
+	}
+
+	req, err := http.NewRequest( //Starts to construct a request.
+		http.MethodPost, // Posting to the lastest handler of the service.
+		os.Getenv("CURRENCY_URI")+"currency/latest/",
+		ioutil.NopCloser(body),
+	)
+
+	log.Printf("Request: %+v", req)
+
+	resp, err := http.DefaultClient.Do(req) // Sends request to currencyservice and revieves response.
+	if err != nil {
+		w.Write(MessageSlack("", true)) //They fucked up.
+		return
+	}
+
+	log.Println("respBody: ", resp)
+	parsedRate, err := ParseFixerResponse(resp.Body)
+	if err != nil {
+		w.Write(MessageSlack("", true)) //We fucked up.
+		return
+	}
+
+	convertedRate := amount * parsedRate
+	w.Write(MessageSlack(fmt.Sprintf("%f %v is equal to %f %v. ^^", amount, base, convertedRate, target), true)) //Temporary outprint
+
 }
 
 // ConversionResponse - A representation of the resposnse from DialogFlow
@@ -161,10 +154,12 @@ func QueryCurrencyConversion(text string) (base, target string, amount float64, 
 
 	base = result.Result.Parameters.CurrencyIn.CurrencyName
 	target = result.Result.Parameters.CurrencyOut.CurrencyName
+	errBase := validate.Currency(base)
+	errTarget := validate.Currency(target)
 	unparsedAmount := result.Result.Parameters.Amount
-	if base == "" || target == "" || unparsedAmount == "" {
+	if errBase != nil || errTarget != nil || unparsedAmount == "" {
 		code = http.StatusPartialContent
-		amount = 0
+		amount = 1
 		return
 	}
 	amount, err = strconv.ParseFloat(unparsedAmount, 64)
