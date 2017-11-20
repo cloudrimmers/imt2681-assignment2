@@ -1,1 +1,1 @@
-web: currencyservice heroku
+web: rimbot local
