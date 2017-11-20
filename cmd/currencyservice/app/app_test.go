@@ -49,11 +49,11 @@ func TestGetLatestCurrency(t *testing.T) {
 	// 2. Define table
 	table := map[types.CurrencyIn]int{
 		//{BaseCurrency: "RAR", TargetCurrency: "NOK"}: http.StatusBadRequest, //@todo - This should be handled as a bad request
-		{BaseCurrency: "EUR", TargetCurrency: "EUR"}: http.StatusBadRequest,
 		{BaseCurrency: "AAA", TargetCurrency: "EUR"}: http.StatusBadRequest,
 		{BaseCurrency: "EUR", TargetCurrency: "AAA"}: http.StatusBadRequest,
-		{BaseCurrency: "USD", TargetCurrency: "EUR"}: http.StatusNotFound,
+		{BaseCurrency: "USD", TargetCurrency: "EUR"}: http.StatusOK,
 		{BaseCurrency: "EUR", TargetCurrency: "NOK"}: http.StatusOK,
+		{BaseCurrency: "EUR", TargetCurrency: "EUR"}: http.StatusOK,
 	}
 
 	// 3. Run tests
