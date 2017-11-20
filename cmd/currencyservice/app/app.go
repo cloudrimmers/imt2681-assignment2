@@ -59,17 +59,41 @@ func (app *App) GetLatestCurrency(w http.ResponseWriter, r *http.Request) {
 	}
 	defer app.Mongo.Close()
 
+
+
+
 	// 3. Find latest entry in fixer collection
+
+	// @NOTE Doing the long proposed conversion hack.
+	//  Leaving the old mode here, for later reference - JSolsvik 20.11.17
+	// ---------------- OLD PROPER -------------------------
+	/*
 	fixer := types.FixerIn{}
 	err = collectionFixer.Find(bson.M{"base": reqBody.BaseCurrency}).Sort("-date").One(&fixer)
 	if err != nil {
 		httperror.NotFound(w, "cfixer.Find()", err)
 		return
 	}
-
 	// 4. Respond
 	fmt.Fprintf(w, "%.2f", fixer.Rates[reqBody.TargetCurrency])
 
+	*/
+	// ---------------- END OLD PROPER -------------------------
+
+	// ---------------------- @HACK -------------------------
+	fixer := types.FixerIn{}
+	err = collectionFixer.Find(bson.M{"base": "EUR"}).Sort("-date").One(&fixer)
+	if err != nil {
+		httperror.NotFound(w, "cfixer.Find()", err)
+		return
+	}
+
+	// 4. Respond
+	fixer.Rates["EUR"] = 1.0
+	rate := fixer.Rates[reqBody.TargetCurrency] / fixer.Rates[reqBody.BaseCurrency]
+	fmt.Fprintf(w, "%.2f", rate)
+
+	// ---------------- END HACK ------------------------- - JSolsvik 20.11.17
 }
 
 // SeedFixerdata ...
