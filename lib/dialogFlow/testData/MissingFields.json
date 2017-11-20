@@ -1,0 +1,35 @@
+{
+    "id": "4ca4b9db-aa5a-4c82-bae0-20ea35ed132f",
+    "timestamp": "2017-11-19T22:43:03.169Z",
+    "lang": "en",
+    "result": {
+        "source": "agent",
+        "resolvedQuery": "rimbot hi",
+        "action": "input.unknown",
+        "actionIncomplete": false,
+        "parameters": {},
+        "contexts": [],
+        "metadata": {
+            "intentId": "f7ce27eb-3186-4f87-82c1-1224b1bcb827",
+            "webhookUsed": "false",
+            "webhookForSlotFillingUsed": "false",
+            "intentName": "Default Fallback Intent"
+        },
+        "fulfillment": {
+            "speech": "I didn't get that.",
+            "messages": [
+                {
+                    "type": 0,
+                    "speech": "What was that?"
+                }
+            ]
+        },
+        "score": 1
+    },
+    "status": {
+        "code": 200,
+        "errorType": "success",
+        "webhookTimedOut": false
+    },
+    "sessionId": "1"
+}
