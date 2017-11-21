@@ -1,10 +1,20 @@
-FROM golang:1.9.2-stretch
+FROM golang:1.9.2-stretch as builder
 
-# RUN apt-get update && apt-get -y upgrade
-ENV PROJECT_ROOT=$GOPATH/src/github.com/cloudrimmers/imt2681-assignment3
+#
+# 1. BUILD STATGE
+#
+ENV PROJECT_ROOT=/go/src/github.com/cloudrimmers/imt2681-assignment3
 COPY . $PROJECT_ROOT
 WORKDIR $PROJECT_ROOT
 
-RUN go install -v ./cmd/fixerworker
+RUN CGO_ENABLED=0 GOOS=linux \
+		go build -a \
+				 -ldflags '-extldflags "-static"' \
+				 -v \
+				 -o ./bin/fixerworker \
+				 ./cmd/fixerworker
 
-CMD ["fixerworker", "docker"]
+RUN cp $PROJECT_ROOT/bin/fixerworker /fixerworker
+
+# Run code
+CMD ["/fixerworker", "docker"]

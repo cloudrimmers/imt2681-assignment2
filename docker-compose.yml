@@ -4,46 +4,38 @@ services:
   # 1. RIMBOT
   #
   rimbot:
+    env_file: ./cmd/rimbot/.env
     build: 
       context: .
       dockerfile: ./cmd/rimbot/Dockerfile
     
-    env_file: ./cmd/rimbot/.env
-    
     depends_on: 
       - currencyservice
+      
     ports: 
-      - "5000:5000"  
+      - "${RIMBOT_PORT}:${RIMBOT_PORT}"  
   #
   # 2. CURRENCYSERVICE  
   #
   currencyservice:
+    env_file: ./cmd/currencyservice/.env
     build:
       context: .
       dockerfile: ./cmd/currencyservice/Dockerfile
     
-    env_file: ./cmd/currencyservice/.env
-    environment:
-      MONGODB_URI: mongo
-    
     expose:
-      - "5001"
+      - "${CURRENCY_PORT}"
     depends_on: 
       - mongo  
   #
   # 3. FIXERWORKER 
   #
   fixerworker:
+    env_file: ./cmd/fixerworker/.env
     build: 
       context: .
       dockerfile: ./cmd/fixerworker/Dockerfile
-    
-    env_file: ./cmd/fixerworker/.env
-    environment:
-      MONGODB_URI: mongo
-    
-    expose:
-      - "5002"
+
     depends_on: 
       - mongo  
   #
@@ -51,12 +43,12 @@ services:
   #
   mongo:
     image: mongo:latest
-
+    expose:
+      - "${MONGO_PORT}"
+    ports:
+      - "${MONGO_PORT}:${MONGO_PORT}"
     volumes:
       - dbdata:/data/db
 
-    expose:
-      - "27017"
-        
 volumes:
   dbdata:

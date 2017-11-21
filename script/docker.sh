@@ -71,13 +71,13 @@ case $1 in
 		docker_run fixerworker 5002
   		;;
 	"fwbuild")
-		docker_build fixerworker 5002
+		docker_build fixerworker
   		;;
   	"rbrun")
 		docker_run rimbot 5000	  
   		;;
 	"rbbuild")
-  		docker_build rimbot 5000
+  		docker_build rimbot
   		;;
   	"mgrun")
 		mongo_run
